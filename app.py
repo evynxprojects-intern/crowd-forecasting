@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request, jsonify
 import pandas as pd
 import numpy as np
@@ -59,8 +58,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 xgb_model = xgb.XGBClassifier(
     n_estimators=300, max_depth=4, learning_rate=0.1,
     subsample=0.9, colsample_bytree=0.8, min_child_weight=5,
-    use_label_encoder=False, eval_metric="mlogloss",
-    random_state=42, n_jobs=-1)
+    eval_metric="mlogloss", random_state=42, n_jobs=-1)
 xgb_model.fit(X_train, y_train)
 
 rf_model = RandomForestClassifier(
@@ -73,7 +71,7 @@ lr_pipe = Pipeline([
     ("scaler", StandardScaler()),
     ("lr", LogisticRegression(
         max_iter=1000, class_weight="balanced",
-        random_state=42, multi_class="multinomial"))])
+        random_state=42))])
 lr_pipe.fit(X_train, y_train)
 
 model = VotingClassifier(
