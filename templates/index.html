@@ -1,627 +1,1163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🇮🇳 India Crowd Forecasting System</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Crowd Forecast — India Tourism</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --saffron : #FF9933;
-      --green   : #138808;
-      --navy    : #000080;
-      --light   : #FFF8F0;
+      --navy    : #1B2A4A;
+      --navy2   : #243555;
+      --saffron : #F97316;
+      --saffron2: #EA6A04;
+      --high    : #EF4444;
+      --medium  : #F97316;
+      --low     : #22C55E;
+      --bg      : #F0F4F8;
+      --card    : #FFFFFF;
+      --text    : #1E293B;
+      --muted   : #64748B;
+      --border  : #E2E8F0;
+      --radius  : 14px;
     }
-    body { background:#f8f9fa; font-family:"Segoe UI",sans-serif; }
-    .navbar {
-      background: linear-gradient(135deg, var(--saffron) 0%, #fff 50%, var(--green) 100%);
-      box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
     }
-    .navbar-brand { font-weight:700; font-size:1.3rem; color:#333 !important; }
-    .hero {
-      background: linear-gradient(135deg, var(--saffron) 0%, #FFD700 50%, var(--green) 100%);
-      padding: 60px 0 50px; color:white;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+
+    /* ── SIDEBAR ───────────────────────────────── */
+    .sidebar {
+      width: 220px;
+      min-height: 100vh;
+      background: var(--navy);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 100;
     }
-    .hero h1 { font-size:2.5rem; font-weight:800; }
-    .search-card {
-      border-radius:20px;
-      box-shadow:0 10px 40px rgba(0,0,0,0.15);
-      border:none; margin-top:-30px;
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 36px;
+      padding: 0 8px;
     }
-    .btn-predict {
-      background:linear-gradient(135deg,var(--saffron),var(--green));
-      border:none; color:white; font-weight:600;
-      padding:12px 40px; border-radius:50px;
-      font-size:1.1rem; transition:all 0.3s;
+
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: var(--saffron);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
     }
-    .btn-predict:hover {
-      transform:translateY(-2px);
-      box-shadow:0 5px 20px rgba(0,0,0,0.2);
-      color:white;
+
+    .logo-text h2 {
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.2;
     }
+
+    .logo-text p {
+      color: #94A3B8;
+      font-size: 11px;
+      font-weight: 400;
+    }
+
+    .nav-section {
+      flex: 1;
+    }
+
+    .nav-label {
+      color: #64748B;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 0 8px;
+      margin-bottom: 8px;
+      margin-top: 16px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      color: #94A3B8;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+      margin-bottom: 2px;
+      text-decoration: none;
+    }
+
+    .nav-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
+    .nav-item.active { background: var(--saffron); color: #fff; }
+    .nav-item .icon { width: 18px; text-align: center; font-size: 16px; }
+
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      margin-top: 16px;
+    }
+
+    .user-avatar {
+      width: 34px; height: 34px;
+      background: var(--saffron);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .user-info p { color: #fff; font-size: 13px; font-weight: 600; }
+    .user-info span { color: #64748B; font-size: 11px; }
+
+    /* ── MAIN ──────────────────────────────────── */
+    .main {
+      margin-left: 220px;
+      flex: 1;
+      padding: 28px;
+      min-height: 100vh;
+    }
+
+    .page-header {
+      margin-bottom: 24px;
+    }
+
+    .page-header h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .page-header p {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    /* ── TWO COLUMN LAYOUT ─────────────────────── */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* ── SEARCH PANEL ──────────────────────────── */
+    .search-panel {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .form-group { margin-bottom: 18px; }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .search-wrapper { position: relative; }
+
+    .search-input {
+      width: 100%;
+      padding: 11px 40px 11px 38px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: #F8FAFC;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    .search-input:focus { border-color: var(--saffron); background: #fff; }
+
+    .search-icon {
+      position: absolute;
+      left: 12px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 12px; top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 16px;
+      display: none;
+    }
+
+    .autocomplete-list {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0; right: 0;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      z-index: 50;
+      max-height: 260px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .autocomplete-item {
+      padding: 10px 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      transition: background 0.15s;
+    }
+
+    .autocomplete-item:hover { background: #F8FAFC; }
+
+    .autocomplete-item .place-emoji { font-size: 16px; width: 22px; text-align: center; }
+    .autocomplete-item .place-name { font-weight: 600; color: var(--text); }
+    .autocomplete-item .place-loc { font-size: 12px; color: var(--muted); }
+
+    /* Month Picker */
+    .month-year-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .select-input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: #F8FAFC;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748B' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+
+    .select-input:focus { border-color: var(--saffron); background-color: #fff; }
+
+    /* Predict Button */
+    .predict-btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--saffron);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .predict-btn:hover { background: var(--saffron2); }
+    .predict-btn:active { transform: scale(0.99); }
+    .predict-btn:disabled { background: #CBD5E1; cursor: not-allowed; }
+
+    /* Popular places */
+    .popular-section { margin-top: 20px; }
+    .popular-title { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
+
+    .popular-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      padding: 6px 12px;
+      background: #F1F5F9;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1.5px solid transparent;
+    }
+
+    .chip:hover { background: #fff; border-color: var(--saffron); color: var(--saffron); }
+
+    /* How it works box */
+    .how-box {
+      margin-top: 20px;
+      padding: 14px;
+      background: #EFF6FF;
+      border-radius: 10px;
+      border-left: 3px solid #3B82F6;
+    }
+
+    .how-box h4 { font-size: 13px; font-weight: 700; color: #1E40AF; margin-bottom: 4px; }
+    .how-box p { font-size: 12px; color: #1D4ED8; line-height: 1.5; }
+
+    /* ── RESULTS PANEL ─────────────────────────── */
+    .results-panel { display: flex; flex-direction: column; gap: 16px; }
+
+    /* Empty state */
+    .empty-state {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 60px 40px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-state h3 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .empty-state p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    /* Place Result Card */
+    .result-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .result-card-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .place-image {
+      width: 70px; height: 70px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #1B2A4A, #3B5998);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      flex-shrink: 0;
+    }
+
+    .place-meta h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .place-meta .location {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .place-meta .type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      background: #F1F5F9;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* Prediction section */
+    .prediction-section {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .prediction-for { flex: 1; }
+
+    .prediction-for .pred-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .prediction-for .pred-date {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      margin-top: 4px;
+    }
+
     .crowd-badge {
-      font-size:1.5rem; padding:10px 25px;
-      border-radius:50px; font-weight:700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-radius: 12px;
+      min-width: 140px;
     }
-    .crowd-low    { background:#d4edda; color:#155724; }
-    .crowd-medium { background:#fff3cd; color:#856404; }
-    .crowd-high   { background:#f8d7da; color:#721c24; }
-    .stat-card {
-      border-radius:15px; border:none;
-      box-shadow:0 4px 15px rgba(0,0,0,0.08);
-      transition:transform 0.3s;
+
+    .crowd-badge.high   { background: #FEF2F2; }
+    .crowd-badge.medium { background: #FFF7ED; }
+    .crowd-badge.low    { background: #F0FDF4; }
+
+    .crowd-badge .badge-icon { font-size: 24px; }
+
+    .crowd-badge .badge-label {
+      font-size: 20px;
+      font-weight: 800;
     }
-    .stat-card:hover { transform:translateY(-5px); }
-    .stat-icon {
-      width:55px; height:55px; border-radius:15px;
-      display:flex; align-items:center;
-      justify-content:center; font-size:1.4rem; color:white;
+
+    .crowd-badge.high   .badge-label { color: var(--high); }
+    .crowd-badge.medium .badge-label { color: var(--medium); }
+    .crowd-badge.low    .badge-label { color: var(--low); }
+
+    .crowd-badge .badge-sub {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-top: 2px;
     }
-    .icon-orange { background:linear-gradient(135deg,#FF9933,#ff6b00); }
-    .icon-green  { background:linear-gradient(135deg,#138808,#0d5e06); }
-    .icon-blue   { background:linear-gradient(135deg,#007bff,#0056b3); }
-    .icon-purple { background:linear-gradient(135deg,#6f42c1,#4a2d8f); }
+
+    /* Confidence */
+    .confidence-section {
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .conf-label { font-size: 13px; font-weight: 600; color: var(--muted); min-width: 90px; }
+    .conf-bar-wrap { flex: 1; background: #F1F5F9; border-radius: 20px; height: 8px; overflow: hidden; }
+    .conf-bar { height: 100%; border-radius: 20px; transition: width 0.6s ease; }
+    .conf-value { font-size: 15px; font-weight: 800; color: var(--text); min-width: 44px; text-align: right; }
+
+    /* Reason */
+    .reason-section {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .reason-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .reason-box:last-child { margin-bottom: 0; }
+    .reason-box.high   { background: #FEF2F2; color: #991B1B; }
+    .reason-box.medium { background: #FFF7ED; color: #92400E; }
+    .reason-box.low    { background: #F0FDF4; color: #14532D; }
+
+    /* Month tip */
+    .tip-section {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tip-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      background: #EFF6FF;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #1D4ED8;
+    }
+
+    /* ── RECOMMENDATIONS ───────────────────────── */
     .rec-card {
-      border-radius:15px; border:none;
-      box-shadow:0 4px 15px rgba(0,0,0,0.08);
-      transition:all 0.3s; cursor:pointer;
+      background: var(--card);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
-    .rec-card:hover {
-      transform:translateY(-5px);
-      box-shadow:0 8px 25px rgba(0,0,0,0.15);
+
+    .rec-card-header {
+      padding: 18px 20px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    .place-row { cursor:pointer; transition:background 0.2s; }
-    .place-row:hover { background:#fff8f0; }
-    .tab-custom .nav-link {
-      color:#666; border-radius:10px;
-      margin:0 5px; font-weight:600; padding:10px 20px;
+
+    .rec-card-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
     }
-    .tab-custom .nav-link.active {
-      background:linear-gradient(135deg,var(--saffron),var(--green));
-      color:white;
+
+    .rec-card-header p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
     }
-    #loading {
-      display:none; position:fixed;
-      top:0; left:0; width:100%; height:100%;
-      background:rgba(255,255,255,0.85);
-      z-index:9999; align-items:center; justify-content:center;
+
+    .view-map-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      background: #EFF6FF;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #2563EB;
+      cursor: pointer;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      text-decoration: none;
+      white-space: nowrap;
     }
+
+    .view-map-btn:hover { background: #DBEAFE; }
+
+    .rec-list { padding: 0 12px 12px; display: flex; gap: 12px; overflow-x: auto; }
+    .rec-list::-webkit-scrollbar { height: 4px; }
+    .rec-list::-webkit-scrollbar-track { background: #F1F5F9; }
+    .rec-list::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+
+    .rec-item {
+      min-width: 180px;
+      max-width: 180px;
+      background: #F8FAFC;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1.5px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .rec-item:hover { border-color: var(--saffron); box-shadow: 0 4px 12px rgba(249,115,22,0.1); }
+
+    .rec-img {
+      width: 100%;
+      height: 90px;
+      background: linear-gradient(135deg, #1B2A4A, #3B5998);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      position: relative;
+    }
+
+    .rec-crowd-badge {
+      position: absolute;
+      top: 8px; right: 8px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .rec-crowd-badge.High   { background: var(--high); }
+    .rec-crowd-badge.Medium { background: var(--medium); }
+    .rec-crowd-badge.Low    { background: var(--low); }
+
+    .rec-info { padding: 10px 12px; }
+    .rec-info .rec-name { font-size: 13px; font-weight: 700; color: var(--text); }
+    .rec-info .rec-city { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .rec-stats {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+
+    .rec-stat { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 3px; }
+    .rec-stat span { font-weight: 600; color: var(--text); }
+
+    /* No recs */
+    .no-rec-tip {
+      padding: 16px 20px;
+      margin: 0 12px 12px;
+      background: #EFF6FF;
+      border-radius: 10px;
+      font-size: 13px;
+      color: #1D4ED8;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ── LOADING ────────────────────────────────── */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loading-overlay.active { display: flex; }
+
     .spinner {
-      width:60px; height:60px;
-      border:5px solid #f3f3f3;
-      border-top:5px solid var(--saffron);
-      border-radius:50%; animation:spin 1s linear infinite;
+      width: 48px; height: 48px;
+      border: 4px solid var(--border);
+      border-top-color: var(--saffron);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
     }
-    @keyframes spin { 100%{ transform:rotate(360deg); } }
-    footer {
-      background:linear-gradient(135deg,var(--saffron),var(--green));
-      color:white; padding:20px 0; margin-top:60px;
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── TOAST ──────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      background: #1E293B;
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 300;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s;
+    }
+
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ── MOBILE ─────────────────────────────────── */
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 16px; }
+      .content-grid { grid-template-columns: 1fr; }
+
+      .mobile-nav {
+        display: flex !important;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        background: var(--navy);
+        padding: 8px 0 12px;
+        z-index: 100;
+      }
+
+      .mobile-nav a {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        color: #64748B;
+        font-size: 10px;
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .mobile-nav a.active { color: var(--saffron); }
+      .mobile-nav a span { font-size: 20px; }
+
+      .main { padding-bottom: 80px; }
+    }
+
+    .mobile-nav { display: none; }
+
+    /* ── ANIMATIONS ─────────────────────────────── */
+    .fade-in {
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
 
-<!-- Loading -->
-<div id="loading">
-  <div class="text-center">
-    <div class="spinner mx-auto mb-3"></div>
-    <p class="fw-bold text-muted">Predicting crowd level...</p>
-  </div>
-</div>
-
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg">
-  <div class="container">
-    <a class="navbar-brand" href="#">🇮🇳 India Crowd Forecasting System</a>
-    <div class="d-flex gap-3">
-      <span class="badge bg-success fs-6">{{ total_places }} Places</span>
-      <span class="badge bg-warning text-dark fs-6">{{ model_accuracy }}% Accuracy</span>
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🗺️</div>
+    <div class="logo-text">
+      <h2>Crowd Forecast</h2>
+      <p>India Tourism</p>
     </div>
   </div>
+
+  <nav class="nav-section">
+    <div class="nav-label">Menu</div>
+    <a class="nav-item active" href="#">
+      <span class="icon">🏠</span> Home
+    </a>
+    <a class="nav-item" href="#" onclick="showShap(); return false;">
+      <span class="icon">📊</span> Model Insights
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">📍</span> Saved Places
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">ℹ️</span> About
+    </a>
+  </nav>
+
+  <div class="sidebar-user">
+    <div class="user-avatar">HK</div>
+    <div class="user-info">
+      <p>Harsh Kumar</p>
+      <span>Data Scientist</span>
+    </div>
+  </div>
+</aside>
+
+<!-- Mobile nav -->
+<nav class="mobile-nav">
+  <a href="#" class="active"><span>🏠</span>Home</a>
+  <a href="#" onclick="showShap(); return false;"><span>📊</span>Insights</a>
+  <a href="#"><span>📍</span>Saved</a>
+  <a href="#"><span>ℹ️</span>About</a>
 </nav>
 
-<!-- Hero -->
-<div class="hero text-center">
-  <div class="container">
-    <h1>🏛️ Indian Crowd Forecasting</h1>
-    <p class="lead mb-0">
-      AI-powered crowd prediction for {{ total_places }} Indian tourist places
-      across {{ total_states }} states and UTs
-    </p>
-  </div>
-</div>
-
 <!-- Main -->
-<div class="container py-4">
-
-  <!-- Search Card -->
-  <div class="card search-card p-4 mb-5">
-    <h5 class="fw-bold mb-4 text-center">
-      <i class="fas fa-search text-warning me-2"></i>
-      Search Any Indian Tourist Place
-    </h5>
-    <div class="row g-3 align-items-end">
-      <div class="col-md-5">
-        <label class="form-label fw-semibold">Place Name</label>
-        <input type="text" id="placeInput" class="form-control form-control-lg"
-               placeholder="e.g. Taj Mahal, Red Fort, Calangute Beach..."
-               list="placesList" autocomplete="off">
-        <datalist id="placesList">
-          {% for p in places %}<option value="{{ p }}">{% endfor %}
-        </datalist>
-      </div>
-      <div class="col-md-3">
-        <label class="form-label fw-semibold">Day of Week</label>
-        <select id="daySelect" class="form-select form-select-lg">
-          <option>Monday</option><option>Tuesday</option>
-          <option>Wednesday</option><option>Thursday</option>
-          <option>Friday</option><option selected>Saturday</option>
-          <option>Sunday</option>
-        </select>
-      </div>
-      <div class="col-md-2">
-        <label class="form-label fw-semibold">Time</label>
-        <select id="timeSelect" class="form-select form-select-lg">
-          <option>Morning</option>
-          <option selected>Afternoon</option>
-          <option>Evening</option>
-        </select>
-      </div>
-      <div class="col-md-2">
-        <button class="btn btn-predict w-100" onclick="predict()">
-          <i class="fas fa-magic me-2"></i>Predict
-        </button>
-      </div>
-    </div>
+<main class="main">
+  <div class="page-header">
+    <h1>Predict Crowd for Any Month</h1>
+    <p>Get crowd predictions for 12,655 Indian tourist places up to 6 months ahead.</p>
   </div>
 
-  <!-- Results -->
-  <div id="results" style="display:none;">
-    <div class="row g-4 mb-4">
+  <div class="content-grid">
 
-      <!-- Place Details -->
-      <div class="col-md-5">
-        <div class="card stat-card h-100 p-4">
-          <h6 class="text-muted fw-semibold mb-3">
-            <i class="fas fa-map-marker-alt text-danger me-2"></i>PLACE DETAILS
-          </h6>
-          <h4 id="r-name" class="fw-bold mb-1"></h4>
-          <p id="r-location" class="text-muted mb-2"></p>
-          <div class="d-flex gap-2 flex-wrap mb-3">
-            <span id="r-type"    class="badge bg-primary"></span>
-            <span id="r-entry"   class="badge bg-success"></span>
-            <span id="r-dslr"    class="badge bg-info"></span>
-            <span id="r-airport" class="badge bg-secondary"></span>
-          </div>
-          <div class="d-flex justify-content-between">
-            <div>⭐ <strong id="r-rating"></strong>/5.0</div>
-            <div>🕐 <strong id="r-time-needed"></strong> hrs</div>
-            <div>🌤️ Best: <strong id="r-best-time"></strong></div>
-          </div>
+    <!-- Search Panel -->
+    <div class="search-panel">
+      <div class="form-group">
+        <label class="form-label">Search Place</label>
+        <div class="search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" id="searchInput"
+                 placeholder="e.g. Taj Mahal, Goa Beaches..."
+                 autocomplete="off"/>
+          <span class="search-clear" id="searchClear" onclick="clearSearch()">✕</span>
+          <div class="autocomplete-list" id="autoList"></div>
         </div>
       </div>
 
-      <!-- Prediction -->
-      <div class="col-md-7">
-        <div class="card stat-card h-100 p-4">
-          <h6 class="text-muted fw-semibold mb-3">
-            <i class="fas fa-chart-bar text-warning me-2"></i>CROWD PREDICTION
-          </h6>
-          <div class="text-center mb-3">
-            <span id="r-crowd-badge" class="crowd-badge"></span>
-          </div>
-          <div class="mb-3">
-            <div class="d-flex justify-content-between mb-1">
-              <small class="fw-semibold text-success">🟢 Low</small>
-              <small id="conf-low">0%</small>
-            </div>
-            <div class="progress mb-2" style="height:10px;">
-              <div id="bar-low" class="progress-bar bg-success" style="width:0%;transition:width 1s;"></div>
-            </div>
-            <div class="d-flex justify-content-between mb-1">
-              <small class="fw-semibold text-warning">🟡 Medium</small>
-              <small id="conf-medium">0%</small>
-            </div>
-            <div class="progress mb-2" style="height:10px;">
-              <div id="bar-medium" class="progress-bar bg-warning" style="width:0%;transition:width 1s;"></div>
-            </div>
-            <div class="d-flex justify-content-between mb-1">
-              <small class="fw-semibold text-danger">🔴 High</small>
-              <small id="conf-high">0%</small>
-            </div>
-            <div class="progress" style="height:10px;">
-              <div id="bar-high" class="progress-bar bg-danger" style="width:0%;transition:width 1s;"></div>
-            </div>
-          </div>
-          <div id="r-advice" class="p-2 rounded mb-3"></div>
-          <div class="row text-center">
-            <div class="col-4">
-              <div class="fw-bold text-primary" id="r-overall-busy"></div>
-              <small class="text-muted">Overall</small>
-            </div>
-            <div class="col-4">
-              <div class="fw-bold text-warning" id="r-day-busy"></div>
-              <small class="text-muted" id="r-day-label">Today</small>
-            </div>
-            <div class="col-4">
-              <div class="fw-bold text-danger" id="r-time-busy"></div>
-              <small class="text-muted" id="r-time-label">This time</small>
-            </div>
-          </div>
+      <div class="form-group">
+        <label class="form-label">Select Month & Year</label>
+        <div class="month-year-row">
+          <select class="select-input" id="monthSelect">
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10" selected>October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+          <select class="select-input" id="yearSelect">
+            <option value="2025">2025</option>
+            <option value="2026" selected>2026</option>
+            <option value="2027">2027</option>
+          </select>
         </div>
+      </div>
+
+      <button class="predict-btn" id="predictBtn" onclick="predict()" disabled>
+        🔮 Predict Crowd
+      </button>
+
+      <div class="popular-section">
+        <p class="popular-title">Try popular places:</p>
+        <div class="popular-chips" id="popularChips">
+          <div class="chip" style="color:#94A3B8">Loading...</div>
+        </div>
+      </div>
+
+      <div class="how-box">
+        <h4>How it works?</h4>
+        <p>We analyse festival calendars, real weather patterns, and Google search trends to predict crowd levels for any month.</p>
       </div>
     </div>
 
-    <!-- Recommendations -->
-    <div id="rec-section" style="display:none;">
-      <h5 class="fw-bold mb-3">
-        <i class="fas fa-lightbulb text-warning me-2"></i>
-        Less Crowded Alternatives
-      </h5>
-      <div class="row g-3" id="rec-cards"></div>
+    <!-- Results Panel -->
+    <div class="results-panel" id="resultsPanel">
+      <div class="empty-state fade-in">
+        <div class="empty-icon">🗺️</div>
+        <h3>Search for a place to begin</h3>
+        <p>Enter any of the 12,655 Indian tourist destinations above and select a month to get a crowd prediction with smart recommendations.</p>
+      </div>
     </div>
+
   </div>
+</main>
 
-  <!-- Stats -->
-  <div class="row g-4 my-5">
-    <div class="col-md-3 col-6">
-      <div class="card stat-card p-3">
-        <div class="d-flex align-items-center gap-3">
-          <div class="stat-icon icon-orange">🏛️</div>
-          <div>
-            <div class="fw-bold fs-4">{{ total_places }}</div>
-            <small class="text-muted">Indian Places</small>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3 col-6">
-      <div class="card stat-card p-3">
-        <div class="d-flex align-items-center gap-3">
-          <div class="stat-icon icon-green">📍</div>
-          <div>
-            <div class="fw-bold fs-4">{{ total_states }}</div>
-            <small class="text-muted">States & UTs</small>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3 col-6">
-      <div class="card stat-card p-3">
-        <div class="d-flex align-items-center gap-3">
-          <div class="stat-icon icon-blue">🎯</div>
-          <div>
-            <div class="fw-bold fs-4">{{ model_accuracy }}%</div>
-            <small class="text-muted">ML Accuracy</small>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3 col-6">
-      <div class="card stat-card p-3">
-        <div class="d-flex align-items-center gap-3">
-          <div class="stat-icon icon-purple">🏙️</div>
-          <div>
-            <div class="fw-bold fs-4">{{ total_cities }}</div>
-            <small class="text-muted">Cities</small>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tabs -->
-  <ul class="nav tab-custom mb-4">
-    <li class="nav-item">
-      <a class="nav-link active" onclick="showTab('dashboard')" id="tab-dashboard">
-        <i class="fas fa-chart-pie me-1"></i>Dashboard
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" onclick="showTab('places')" id="tab-places">
-        <i class="fas fa-list me-1"></i>All Places
-      </a>
-    </li>
-  </ul>
-
-  <!-- Dashboard Tab -->
-  <div id="tab-content-dashboard">
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card stat-card p-3">
-          <h6 class="fw-bold mb-3">Crowd Level Distribution</h6>
-          <canvas id="crowdChart" height="220"></canvas>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card stat-card p-3">
-          <h6 class="fw-bold mb-3">Top Place Types</h6>
-          <canvas id="typeChart" height="220"></canvas>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card stat-card p-3">
-          <h6 class="fw-bold mb-3">Avg Busyness by Day</h6>
-          <canvas id="dayChart" height="220"></canvas>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Places Tab -->
-  <div id="tab-content-places" style="display:none;">
-    <div class="row g-3 mb-3">
-      <div class="col-md-4">
-        <input type="text" id="searchQ" class="form-control"
-               placeholder="🔍 Search places..." oninput="filterPlaces()">
-      </div>
-      <div class="col-md-3">
-        <select id="filterState" class="form-select" onchange="filterPlaces()">
-          <option value="">All States</option>
-          {% for s in states %}<option>{{ s }}</option>{% endfor %}
-        </select>
-      </div>
-      <div class="col-md-2">
-        <select id="filterType" class="form-select" onchange="filterPlaces()">
-          <option value="">All Types</option>
-          {% for t in types %}<option>{{ t }}</option>{% endfor %}
-        </select>
-      </div>
-      <div class="col-md-2">
-        <select id="filterCrowd" class="form-select" onchange="filterPlaces()">
-          <option value="">All Crowds</option>
-          <option>Low</option><option>Medium</option><option>High</option>
-        </select>
-      </div>
-    </div>
-    <div class="card stat-card">
-      <div class="table-responsive">
-        <table class="table table-hover mb-0">
-          <thead class="table-light">
-            <tr>
-              <th>Place</th><th>Type</th><th>City</th>
-              <th>State</th><th>Rating</th><th>Entry</th>
-              <th>Crowd</th><th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="placesTable">
-            <tr><td colspan="8" class="text-center py-4">
-              <div class="spinner mx-auto"></div>
-            </td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <p id="places-count" class="text-muted mt-2 small"></p>
-  </div>
-
+<!-- Loading -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
 </div>
 
-<!-- Footer -->
-<footer class="text-center">
-  <div class="container">
-    <p class="mb-0 fw-semibold">
-      🇮🇳 India Crowd Forecasting & Recommendation System
-      | Phase 1 Prototype | {{ total_places }} Places
-    </p>
-  </div>
-</footer>
+<!-- Toast -->
+<div class="toast" id="toast"></div>
 
 <script>
-async function predict() {
-  const place = document.getElementById("placeInput").value.trim();
-  const day   = document.getElementById("daySelect").value;
-  const time  = document.getElementById("timeSelect").value;
-  if (!place) { alert("Please enter a place name!"); return; }
-  document.getElementById("loading").style.display = "flex";
-  try {
-    const res  = await fetch("/api/predict", {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({place_name:place, day:day, time_of_day:time})
+  // ── State ─────────────────────────────────────
+  let selectedPlace = null;
+  let autoTimeout   = null;
+
+  // ── Init ──────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    loadPopular();
+    setDefaultMonth();
+    document.getElementById('searchInput').addEventListener('input', onSearch);
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.search-wrapper')) closeAuto();
     });
-    const data = await res.json();
-    if (data.error) { alert(data.error); return; }
-    displayResults(data);
-  } catch(e) { alert("Error: "+e.message); }
-  document.getElementById("loading").style.display = "none";
-}
-
-function displayResults(data) {
-  const p    = data.place;
-  const pred = data.prediction;
-  const recs = data.recommendations;
-
-  document.getElementById("r-name").textContent      = p.name;
-  document.getElementById("r-location").textContent  = p.city+", "+p.state;
-  document.getElementById("r-type").textContent      = "🏛️ "+p.type;
-  document.getElementById("r-entry").textContent     = "🎫 "+p.entry_fee;
-  document.getElementById("r-dslr").textContent      = p.dslr ? "📷 DSLR OK" : "📷 No DSLR";
-  document.getElementById("r-airport").textContent   = p.airport ? "✈️ <50km" : "✈️ >50km";
-  document.getElementById("r-rating").textContent    = p.rating.toFixed(1);
-  document.getElementById("r-time-needed").textContent = p.time_needed;
-  document.getElementById("r-best-time").textContent   = p.best_time;
-
-  const badge    = document.getElementById("r-crowd-badge");
-  const bMap     = {Low:["crowd-low","🟢 LOW CROWD"],
-                    Medium:["crowd-medium","🟡 MEDIUM CROWD"],
-                    High:["crowd-high","🔴 HIGH CROWD"]};
-  const [cls,txt]= bMap[pred.crowd_level]||["",""];
-  badge.className = "crowd-badge "+cls;
-  badge.textContent = txt;
-
-  ["Low","Medium","High"].forEach(lv => {
-    const pct = pred.confidence[lv];
-    document.getElementById("conf-"+lv.toLowerCase()).textContent = pct+"%";
-    document.getElementById("bar-"+lv.toLowerCase()).style.width  = pct+"%";
   });
 
-  const aMap = {
-    Low   :"✅ Great time to visit! Minimal crowds expected.",
-    Medium:"⚠️ Moderate crowd. Plan for some waiting.",
-    High  :"❌ Very crowded! Consider the alternatives below.",
-  };
-  const bgMap = {Low:"#d4edda",Medium:"#fff3cd",High:"#f8d7da"};
-  const adv   = document.getElementById("r-advice");
-  adv.textContent       = aMap[pred.crowd_level]||"";
-  adv.style.background  = bgMap[pred.crowd_level]||"#f8f9fa";
-
-  document.getElementById("r-overall-busy").textContent = pred.busyness_avg.toFixed(1)+"/100";
-  document.getElementById("r-day-busy").textContent     = pred.day_busyness.toFixed(1)+"/100";
-  document.getElementById("r-time-busy").textContent    = pred.time_busyness.toFixed(1)+"/100";
-  document.getElementById("r-day-label").textContent    = data.day;
-  document.getElementById("r-time-label").textContent   = data.time_of_day;
-
-  const recSection = document.getElementById("rec-section");
-  const recCards   = document.getElementById("rec-cards");
-
-  if (pred.crowd_level !== "Low" && recs.length > 0) {
-    recSection.style.display = "block";
-    recCards.innerHTML = "";
-    recs.forEach((alt,i) => {
-      const entry   = alt.entry_free ? "Free 🆓" : "₹"+alt.entry_fee;
-      const dist    = alt.distance_km ? `📏 ${alt.distance_km} km` : "";
-      const cMap    = {Low:"success",Medium:"warning",High:"danger"};
-      const crowdCl = cMap[alt.crowd_level]||"secondary";
-      recCards.innerHTML += `
-        <div class="col-md-4">
-          <div class="card rec-card p-3 h-100"
-               onclick="document.getElementById('placeInput').value='${alt.name}';predict()">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-              <span class="badge bg-light text-dark fw-bold">${i+1}</span>
-              <span class="badge bg-${crowdCl}">${alt.crowd_level} Crowd</span>
-            </div>
-            <h6 class="fw-bold mb-1">${alt.name}</h6>
-            <p class="text-muted small mb-2">📍 ${alt.city}, ${alt.state}</p>
-            <div class="d-flex flex-wrap gap-1 mb-2">
-              <span class="badge bg-primary bg-opacity-10 text-primary">${alt.type}</span>
-              <span class="badge bg-secondary bg-opacity-10 text-secondary small">${alt.loc_tag}</span>
-            </div>
-            <div class="mt-auto">
-              <div class="d-flex justify-content-between">
-                <span>⭐ ${alt.rating.toFixed(1)}</span>
-                <span>${entry}</span>
-                <span class="text-muted small">${dist}</span>
-              </div>
-              <div class="text-muted small mt-1">🕐 Best: ${alt.best_time}</div>
-            </div>
-          </div>
-        </div>`;
-    });
-  } else {
-    recSection.style.display = "block";
-    recCards.innerHTML = `
-      <div class="col-12">
-        <div class="alert alert-success">
-          🎉 <strong>${p.name}</strong> has LOW crowd right now. Perfect time to visit!
-        </div>
-      </div>`;
+  function setDefaultMonth() {
+    const now = new Date();
+    const m   = now.getMonth() + 2; // next month
+    const sel = document.getElementById('monthSelect');
+    sel.value = m > 12 ? 1 : m;
+    document.getElementById('yearSelect').value = now.getFullYear();
   }
 
-  document.getElementById("results").style.display = "block";
-  document.getElementById("results").scrollIntoView({behavior:"smooth"});
-}
-
-function showTab(tab) {
-  ["dashboard","places"].forEach(t => {
-    document.getElementById("tab-content-"+t).style.display = t===tab?"block":"none";
-    document.getElementById("tab-"+t).classList.toggle("active",t===tab);
-  });
-  if (tab==="dashboard") loadDashboard();
-  if (tab==="places")    filterPlaces();
-}
-
-let chartsLoaded = false;
-async function loadDashboard() {
-  if (chartsLoaded) return;
-  const res  = await fetch("/api/dashboard");
-  const data = await res.json();
-
-  new Chart(document.getElementById("crowdChart"), {
-    type:"doughnut",
-    data:{
-      labels:Object.keys(data.crowd_dist),
-      datasets:[{
-        data:Object.values(data.crowd_dist),
-        backgroundColor:["#28a745","#ffc107","#dc3545"],
-      }]
-    },
-    options:{plugins:{legend:{position:"bottom"}}}
-  });
-
-  const types = Object.keys(data.type_dist).slice(0,8);
-  new Chart(document.getElementById("typeChart"), {
-    type:"bar",
-    data:{
-      labels:types,
-      datasets:[{data:types.map(t=>data.type_dist[t]),backgroundColor:"#FF9933"}]
-    },
-    options:{
-      indexAxis:"y",
-      plugins:{legend:{display:false}},
-      scales:{x:{grid:{display:false}}}
+  // ── Popular Places ─────────────────────────────
+  async function loadPopular() {
+    try {
+      const res  = await fetch('/api/popular');
+      const data = await res.json();
+      const wrap = document.getElementById('popularChips');
+      wrap.innerHTML = data.map(p =>
+        `<div class="chip" onclick="selectPlace(${JSON.stringify(p).replace(/"/g, '&quot;')})">
+          ${p.emoji} ${p.name.split(',')[0]}
+        </div>`
+      ).join('');
+    } catch (e) {
+      console.error('Popular places error:', e);
     }
-  });
+  }
 
-  new Chart(document.getElementById("dayChart"), {
-    type:"line",
-    data:{
-      labels:Object.keys(data.day_busy),
-      datasets:[{
-        label:"Avg Busyness",
-        data:Object.values(data.day_busy).map(v=>v.toFixed(1)),
-        borderColor:"#138808",
-        backgroundColor:"rgba(19,136,8,0.1)",
-        fill:true, tension:0.4,
-      }]
-    },
-    options:{plugins:{legend:{display:false}}}
-  });
-  chartsLoaded = true;
-}
+  // ── Search ────────────────────────────────────
+  function onSearch(e) {
+    const q = e.target.value.trim();
+    document.getElementById('searchClear').style.display = q ? 'block' : 'none';
 
-async function filterPlaces() {
-  const q     = document.getElementById("searchQ").value;
-  const state = document.getElementById("filterState").value;
-  const type  = document.getElementById("filterType").value;
-  const crowd = document.getElementById("filterCrowd").value;
-  const params = new URLSearchParams();
-  if (q)     params.append("q",q);
-  if (state) params.append("state",state);
-  if (type)  params.append("type",type);
-  if (crowd) params.append("crowd",crowd);
-  const res  = await fetch("/api/search?"+params);
-  const data = await res.json();
-  const tbody = document.getElementById("placesTable");
-  const cMap  = {Low:"success",Medium:"warning",High:"danger"};
-  tbody.innerHTML = data.results.map(p=>`
-    <tr class="place-row"
-        onclick="document.getElementById('placeInput').value='${p.name}';
-        showTab('dashboard');document.getElementById('results').style.display='none';">
-      <td class="fw-semibold">${p.name}</td>
-      <td><span class="badge bg-primary bg-opacity-10 text-primary">${p.type}</span></td>
-      <td>${p.city}</td><td>${p.state}</td>
-      <td>⭐ ${p.rating.toFixed(1)}</td>
-      <td>${p.entry_free?"Free 🆓":"₹"+p.entry_fee}</td>
-      <td><span class="badge bg-${cMap[p.crowd_level]||"secondary"}">${p.crowd_level}</span></td>
-      <td>
-        <button class="btn btn-sm btn-outline-warning"
-          onclick="event.stopPropagation();
-          document.getElementById('placeInput').value='${p.name}';
-          showTab('dashboard');predict();">Predict</button>
-      </td>
-    </tr>`).join("");
-  document.getElementById("places-count").textContent = `Showing ${data.count} places`;
-}
+    if (q !== (selectedPlace?.name || '')) {
+      selectedPlace = null;
+      document.getElementById('predictBtn').disabled = true;
+    }
 
-document.addEventListener("DOMContentLoaded", () => {
-  loadDashboard();
-  document.getElementById("placeInput")
-    .addEventListener("keypress", e => { if(e.key==="Enter") predict(); });
-});
+    clearTimeout(autoTimeout);
+    if (q.length < 2) { closeAuto(); return; }
+    autoTimeout = setTimeout(() => fetchAuto(q), 200);
+  }
+
+  async function fetchAuto(q) {
+    try {
+      const res  = await fetch(`/api/search?q=${encodeURIComponent(q)}&limit=10`);
+      const data = await res.json();
+      showAuto(data);
+    } catch (e) { console.error(e); }
+  }
+
+  function showAuto(places) {
+    const list = document.getElementById('autoList');
+    if (!places.length) { list.style.display = 'none'; return; }
+
+    list.innerHTML = places.map(p => `
+      <div class="autocomplete-item"
+           onclick='selectPlace(${JSON.stringify(p).replace(/'/g, "\\'")})'>
+        <span class="place-emoji">${p.emoji}</span>
+        <div>
+          <div class="place-name">${p.name}</div>
+          <div class="place-loc">${p.city}, ${p.state}</div>
+        </div>
+      </div>
+    `).join('');
+    list.style.display = 'block';
+  }
+
+  function closeAuto() {
+    document.getElementById('autoList').style.display = 'none';
+  }
+
+  function selectPlace(place) {
+    selectedPlace = place;
+    document.getElementById('searchInput').value = `${place.name}, ${place.city}`;
+    document.getElementById('searchClear').style.display = 'block';
+    document.getElementById('predictBtn').disabled = false;
+    closeAuto();
+  }
+
+  function clearSearch() {
+    selectedPlace = null;
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchClear').style.display = 'none';
+    document.getElementById('predictBtn').disabled = true;
+    closeAuto();
+  }
+
+  // ── Predict ───────────────────────────────────
+  async function predict() {
+    if (!selectedPlace) { showToast('Please select a place first'); return; }
+
+    const month = document.getElementById('monthSelect').value;
+    const year  = document.getElementById('yearSelect').value;
+
+    showLoading(true);
+
+    try {
+      const [predRes, recRes] = await Promise.all([
+        fetch(`/api/predict?place_id=${selectedPlace.place_id}&month=${month}&year=${year}`),
+        fetch(`/api/recommend?place_id=${selectedPlace.place_id}&month=${month}`)
+      ]);
+
+      const pred = await predRes.json();
+      const recs = await recRes.json();
+
+      if (pred.error) { showToast(pred.error); return; }
+
+      renderResults(pred, recs);
+
+    } catch (e) {
+      console.error(e);
+      showToast('Something went wrong. Please try again.');
+    } finally {
+      showLoading(false);
+    }
+  }
+
+  // ── Render Results ────────────────────────────
+  function renderResults(pred, recs) {
+    const panel   = document.getElementById('resultsPanel');
+    const cls     = pred.label.toLowerCase();
+    const mapUrl  = `https://www.openstreetmap.org/?mlat=${pred.lat}&mlon=${pred.lon}#map=14/${pred.lat}/${pred.lon}`;
+
+    const reasonsHTML = pred.reasons.map(r =>
+      `<div class="reason-box ${cls}">
+        <span>💡</span>
+        <span>${r}</span>
+      </div>`
+    ).join('');
+
+    const tipHTML = pred.month_tip
+      ? `<div class="tip-section">
+           <div class="tip-box">
+             <span>📅</span>
+             <span>${pred.month_tip.text}</span>
+           </div>
+         </div>`
+      : '';
+
+    const confColor = pred.label === 'High' ? '#EF4444'
+                    : pred.label === 'Low'  ? '#22C55E' : '#F97316';
+
+    const recsHTML = recs.length > 0
+      ? `<div class="rec-list">
+          ${recs.map(r => `
+            <div class="rec-item" onclick='selectAndPredict(${JSON.stringify(r)})'>
+              <div class="rec-img">
+                ${r.emoji}
+                <span class="rec-crowd-badge ${r.crowd}">${r.crowd}</span>
+              </div>
+              <div class="rec-info">
+                <div class="rec-name">${r.place_name}</div>
+                <div class="rec-city">${r.city}, ${r.state}</div>
+                <div class="rec-stats">
+                  <span class="rec-stat">⭐ <span>${r.rating || 'N/A'}</span></span>
+                  <span class="rec-stat">📍 <span>${r.distance}km</span></span>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>`
+      : `<div class="no-rec-tip">
+           📅 No less crowded alternatives nearby this month.
+           ${pred.month_tip ? `<strong>${pred.month_tip.text}</strong>` : 'Try a different month for alternatives.'}
+         </div>`;
+
+    panel.innerHTML = `
+      <!-- Place + Prediction Card -->
+      <div class="result-card fade-in">
+
+        <div class="result-card-header">
+          <div class="place-image">${pred.emoji}</div>
+          <div class="place-meta">
+            <h2>${pred.place_name}</h2>
+            <div class="location">
+              <span>📍</span>
+              <span>${pred.city}, ${pred.state}</span>
+            </div>
+            <span class="type-badge">${pred.emoji} ${pred.place_type}</span>
+          </div>
+          <button onclick="window.open('${mapUrl}','_blank')"
+                  style="margin-left:auto; padding:8px 14px; background:#F1F5F9;
+                         border:none; border-radius:8px; font-size:12px;
+                         font-weight:600; cursor:pointer; color:#475569; white-space:nowrap;">
+            🗺️ View Map
+          </button>
+        </div>
+
+        <div class="prediction-section">
+          <div class="prediction-for">
+            <div class="pred-label">Predicted Crowd for</div>
+            <div class="pred-date">${pred.month_name} ${pred.year}</div>
+          </div>
+          <div class="crowd-badge ${cls}">
+            <span class="badge-icon">${pred.icon}</span>
+            <div>
+              <div class="badge-label">${pred.label}</div>
+              <div class="badge-sub">${pred.label_text}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="confidence-section">
+          <span class="conf-label">Confidence</span>
+          <div class="conf-bar-wrap">
+            <div class="conf-bar"
+                 style="width:${pred.confidence}%; background:${confColor};"></div>
+          </div>
+          <span class="conf-value">${pred.confidence}%</span>
+        </div>
+
+        <div class="reason-section">${reasonsHTML}</div>
+
+        ${tipHTML}
+
+      </div>
+
+      <!-- Recommendations -->
+      <div class="rec-card fade-in">
+        <div class="rec-card-header">
+          <div>
+            <h3>Places You Can Consider Instead</h3>
+            <p>Similar places likely to be less crowded in ${pred.month_name}</p>
+          </div>
+          <a href="${mapUrl}" target="_blank" class="view-map-btn">
+            🗺️ View on Map
+          </a>
+        </div>
+        ${recsHTML}
+      </div>
+    `;
+  }
+
+  function selectAndPredict(place) {
+    selectPlace({
+      place_id: place.place_id,
+      name    : place.place_name,
+      city    : place.city,
+      state   : place.state,
+      type    : place.place_type,
+      emoji   : place.emoji,
+    });
+    predict();
+  }
+
+  // ── SHAP Modal ────────────────────────────────
+  function showShap() {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+      position:fixed; inset:0; background:rgba(0,0,0,0.6);
+      z-index:500; display:flex; align-items:center; justify-content:center;
+      padding:20px;
+    `;
+    overlay.innerHTML = `
+      <div style="background:#fff; border-radius:16px; overflow:hidden;
+                  max-width:700px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+        <div style="padding:16px 20px; border-bottom:1px solid #E2E8F0;
+                    display:flex; align-items:center; justify-content:space-between;">
+          <div>
+            <h3 style="font-size:16px; font-weight:700;">Model Feature Importance</h3>
+            <p style="font-size:13px; color:#64748B;">What drives crowd predictions (SHAP values)</p>
+          </div>
+          <button onclick="this.closest('div').parentElement.remove()"
+                  style="font-size:20px; background:none; border:none; cursor:pointer; color:#64748B;">✕</button>
+        </div>
+        <img src="/api/shap" alt="SHAP Importance Chart"
+             style="width:100%; display:block; padding:16px;"
+             onerror="this.src='https://via.placeholder.com/600x400?text=SHAP+Chart'"/>
+        <div style="padding:12px 20px; background:#F8FAFC; font-size:12px; color:#64748B;">
+          Top driver: Festival signals (35%) — Real weather and search trends also major contributors.
+          LightGBM model | 90,108 test samples | 59 features
+        </div>
+      </div>
+    `;
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.remove();
+    });
+    document.body.appendChild(overlay);
+  }
+
+  // ── Utils ─────────────────────────────────────
+  function showLoading(on) {
+    document.getElementById('loadingOverlay').classList.toggle('active', on);
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
 </script>
 </body>
 </html>
