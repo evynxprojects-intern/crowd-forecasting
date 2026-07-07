@@ -280,7 +280,7 @@
     const tm = String(today.getMonth()+1).padStart(2,'0');
     const td = String(today.getDate()).padStart(2,'0');
     document.getElementById('dateInput').min = `${ty}-${tm}-${td}`;
-    document.getElementById('dateInput').max = '2027-12-31';
+    const maxDate = new Date(); maxDate.setMonth(maxDate.getMonth() + 6); const my = maxDate.getFullYear(); const mm = String(maxDate.getMonth()+1).padStart(2,"0"); const md = String(maxDate.getDate()).padStart(2,"0"); document.getElementById("dateInput").max = `${my}-${mm}-${md}`;
   }
 
   function selectTime(time) {
