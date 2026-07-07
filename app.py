@@ -16,10 +16,10 @@ app = Flask(__name__)
 
 # ── Google Drive File IDs ─────────────────────────
 DRIVE = {
-    'rec_engine': '1pcJEOxTzDAjOzAHaAes5syswgP3XbgGA',
-    'model'     : '1GuJ09DL6jILk7ggN7_v68PSNHld3N_zD',
-    'features'  : '17YGtfWfIxhP7u77rAHVF_yJb-_ZsCIXY',
-    'shap'      : '1SJbVR_EpPP3YA3plok2_KrH0gS0RXjep',
+    'rec_engine': '10peKyAKIAGQNzMxSegTtKugUhpuwEy9y',
+    'model'     : '1VNfcK_GcdeNz726M8iE-D7sCYXiDqmDK',
+    'features'  : '1B7pCpjI1ezrwhjiLqS5ZbX8Sh5_IDa52',
+    'shap'      : '1gE68_5TaBhvY4sPw2M_9vYF04wINC9lT',
 }
 
 CACHE = '/tmp/crowd_cache'
