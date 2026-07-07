@@ -7,814 +7,222 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --navy    : #1B2A4A;
-      --navy2   : #243555;
-      --saffron : #F97316;
-      --saffron2: #EA6A04;
-      --high    : #EF4444;
-      --medium  : #F97316;
-      --low     : #22C55E;
-      --bg      : #F0F4F8;
-      --card    : #FFFFFF;
-      --text    : #1E293B;
-      --muted   : #64748B;
-      --border  : #E2E8F0;
-      --radius  : 14px;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-    }
-
-    /* ── SIDEBAR ───────────────────────────────── */
-    .sidebar {
-      width: 220px;
-      min-height: 100vh;
-      background: var(--navy);
-      display: flex;
-      flex-direction: column;
-      padding: 24px 16px;
-      position: fixed;
-      top: 0; left: 0;
-      z-index: 100;
-    }
-
-    .sidebar-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 36px;
-      padding: 0 8px;
-    }
-
-    .logo-icon {
-      width: 36px; height: 36px;
-      background: var(--saffron);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-    }
-
-    .logo-text h2 {
-      color: #fff;
-      font-size: 14px;
-      font-weight: 700;
-      line-height: 1.2;
-    }
-
-    .logo-text p {
-      color: #94A3B8;
-      font-size: 11px;
-      font-weight: 400;
-    }
-
-    .nav-section {
-      flex: 1;
-    }
-
-    .nav-label {
-      color: #64748B;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      padding: 0 8px;
-      margin-bottom: 8px;
-      margin-top: 16px;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      cursor: pointer;
-      color: #94A3B8;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.2s;
-      margin-bottom: 2px;
-      text-decoration: none;
-    }
-
-    .nav-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
-    .nav-item.active { background: var(--saffron); color: #fff; }
-    .nav-item .icon { width: 18px; text-align: center; font-size: 16px; }
-
-    .sidebar-user {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.05);
-      margin-top: 16px;
-    }
-
-    .user-avatar {
-      width: 34px; height: 34px;
-      background: var(--saffron);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .user-info p { color: #fff; font-size: 13px; font-weight: 600; }
-    .user-info span { color: #64748B; font-size: 11px; }
-
-    /* ── MAIN ──────────────────────────────────── */
-    .main {
-      margin-left: 220px;
-      flex: 1;
-      padding: 28px;
-      min-height: 100vh;
-    }
-
-    .page-header {
-      margin-bottom: 24px;
-    }
-
-    .page-header h1 {
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--text);
-    }
-
-    .page-header p {
-      color: var(--muted);
-      font-size: 14px;
-      margin-top: 4px;
-    }
-
-    /* ── TWO COLUMN LAYOUT ─────────────────────── */
-    .content-grid {
-      display: grid;
-      grid-template-columns: 340px 1fr;
-      gap: 20px;
-      align-items: start;
-    }
-
-    /* ── SEARCH PANEL ──────────────────────────── */
-    .search-panel {
-      background: var(--card);
-      border-radius: var(--radius);
-      padding: 24px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    }
-
-    .form-group { margin-bottom: 18px; }
-
-    .form-label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 8px;
-    }
-
-    .search-wrapper { position: relative; }
-
-    .search-input {
-      width: 100%;
-      padding: 11px 40px 11px 38px;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      font-size: 14px;
-      font-family: 'Inter', sans-serif;
-      color: var(--text);
-      background: #F8FAFC;
-      transition: border-color 0.2s;
-      outline: none;
-    }
-
-    .search-input:focus { border-color: var(--saffron); background: #fff; }
-
-    .search-icon {
-      position: absolute;
-      left: 12px; top: 50%;
-      transform: translateY(-50%);
-      color: var(--muted);
-      font-size: 15px;
-    }
-
-    .search-clear {
-      position: absolute;
-      right: 12px; top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      color: var(--muted);
-      font-size: 16px;
-      display: none;
-    }
-
-    .autocomplete-list {
-      position: absolute;
-      top: calc(100% + 4px);
-      left: 0; right: 0;
-      background: #fff;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      z-index: 50;
-      max-height: 260px;
-      overflow-y: auto;
-      display: none;
-    }
-
-    .autocomplete-item {
-      padding: 10px 14px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 14px;
-      transition: background 0.15s;
-    }
-
-    .autocomplete-item:hover { background: #F8FAFC; }
-
-    .autocomplete-item .place-emoji { font-size: 16px; width: 22px; text-align: center; }
-    .autocomplete-item .place-name { font-weight: 600; color: var(--text); }
-    .autocomplete-item .place-loc { font-size: 12px; color: var(--muted); }
-
-    /* Month Picker */
-    .month-year-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .select-input {
-      width: 100%;
-      padding: 11px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      font-size: 14px;
-      font-family: 'Inter', sans-serif;
-      color: var(--text);
-      background: #F8FAFC;
-      outline: none;
-      cursor: pointer;
-      transition: border-color 0.2s;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748B' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      padding-right: 32px;
-    }
-
-    .select-input:focus { border-color: var(--saffron); background-color: #fff; }
-
-    /* Predict Button */
-    .predict-btn {
-      width: 100%;
-      padding: 13px;
-      background: var(--saffron);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 700;
-      font-family: 'Inter', sans-serif;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .predict-btn:hover { background: var(--saffron2); }
-    .predict-btn:active { transform: scale(0.99); }
-    .predict-btn:disabled { background: #CBD5E1; cursor: not-allowed; }
-
-    /* Popular places */
-    .popular-section { margin-top: 20px; }
-    .popular-title { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
-
-    .popular-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .chip {
-      padding: 6px 12px;
-      background: #F1F5F9;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text);
-      cursor: pointer;
-      transition: all 0.2s;
-      border: 1.5px solid transparent;
-    }
-
-    .chip:hover { background: #fff; border-color: var(--saffron); color: var(--saffron); }
-
-    /* How it works box */
-    .how-box {
-      margin-top: 20px;
-      padding: 14px;
-      background: #EFF6FF;
-      border-radius: 10px;
-      border-left: 3px solid #3B82F6;
-    }
-
-    .how-box h4 { font-size: 13px; font-weight: 700; color: #1E40AF; margin-bottom: 4px; }
-    .how-box p { font-size: 12px; color: #1D4ED8; line-height: 1.5; }
-
-    /* ── RESULTS PANEL ─────────────────────────── */
-    .results-panel { display: flex; flex-direction: column; gap: 16px; }
-
-    /* Empty state */
-    .empty-state {
-      background: var(--card);
-      border-radius: var(--radius);
-      padding: 60px 40px;
-      text-align: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    }
-
-    .empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; }
-    .empty-state h3 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
-    .empty-state p { font-size: 14px; color: var(--muted); line-height: 1.6; }
-
-    /* Place Result Card */
-    .result-card {
-      background: var(--card);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    }
-
-    .result-card-header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 20px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .place-image {
-      width: 70px; height: 70px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #1B2A4A, #3B5998);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 30px;
-      flex-shrink: 0;
-    }
-
-    .place-meta h2 {
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--text);
-    }
-
-    .place-meta .location {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .place-meta .type-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 3px 10px;
-      background: #F1F5F9;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-
-    /* Prediction section */
-    .prediction-section {
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .prediction-for { flex: 1; }
-
-    .prediction-for .pred-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .prediction-for .pred-date {
-      font-size: 20px;
-      font-weight: 800;
-      color: var(--text);
-      margin-top: 4px;
-    }
-
-    .crowd-badge {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 20px;
-      border-radius: 12px;
-      min-width: 140px;
-    }
-
-    .crowd-badge.high   { background: #FEF2F2; }
-    .crowd-badge.medium { background: #FFF7ED; }
-    .crowd-badge.low    { background: #F0FDF4; }
-
-    .crowd-badge .badge-icon { font-size: 24px; }
-
-    .crowd-badge .badge-label {
-      font-size: 20px;
-      font-weight: 800;
-    }
-
-    .crowd-badge.high   .badge-label { color: var(--high); }
-    .crowd-badge.medium .badge-label { color: var(--medium); }
-    .crowd-badge.low    .badge-label { color: var(--low); }
-
-    .crowd-badge .badge-sub {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    /* Confidence */
-    .confidence-section {
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .conf-label { font-size: 13px; font-weight: 600; color: var(--muted); min-width: 90px; }
-    .conf-bar-wrap { flex: 1; background: #F1F5F9; border-radius: 20px; height: 8px; overflow: hidden; }
-    .conf-bar { height: 100%; border-radius: 20px; transition: width 0.6s ease; }
-    .conf-value { font-size: 15px; font-weight: 800; color: var(--text); min-width: 44px; text-align: right; }
-
-    /* Reason */
-    .reason-section {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .reason-box {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 12px 14px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 500;
-      margin-bottom: 6px;
-    }
-
-    .reason-box:last-child { margin-bottom: 0; }
-    .reason-box.high   { background: #FEF2F2; color: #991B1B; }
-    .reason-box.medium { background: #FFF7ED; color: #92400E; }
-    .reason-box.low    { background: #F0FDF4; color: #14532D; }
-
-    /* Month tip */
-    .tip-section {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .tip-box {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 12px 14px;
-      background: #EFF6FF;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 500;
-      color: #1D4ED8;
-    }
-
-    /* ── RECOMMENDATIONS ───────────────────────── */
-    .rec-card {
-      background: var(--card);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    }
-
-    .rec-card-header {
-      padding: 18px 20px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .rec-card-header h3 {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .rec-card-header p {
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .view-map-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 14px;
-      background: #EFF6FF;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #2563EB;
-      cursor: pointer;
-      border: none;
-      font-family: 'Inter', sans-serif;
-      text-decoration: none;
-      white-space: nowrap;
-    }
-
-    .view-map-btn:hover { background: #DBEAFE; }
-
-    .rec-list { padding: 0 12px 12px; display: flex; gap: 12px; overflow-x: auto; }
-    .rec-list::-webkit-scrollbar { height: 4px; }
-    .rec-list::-webkit-scrollbar-track { background: #F1F5F9; }
-    .rec-list::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
-
-    .rec-item {
-      min-width: 180px;
-      max-width: 180px;
-      background: #F8FAFC;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1.5px solid var(--border);
-      cursor: pointer;
-      transition: all 0.2s;
-      flex-shrink: 0;
-    }
-
-    .rec-item:hover { border-color: var(--saffron); box-shadow: 0 4px 12px rgba(249,115,22,0.1); }
-
-    .rec-img {
-      width: 100%;
-      height: 90px;
-      background: linear-gradient(135deg, #1B2A4A, #3B5998);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 36px;
-      position: relative;
-    }
-
-    .rec-crowd-badge {
-      position: absolute;
-      top: 8px; right: 8px;
-      padding: 3px 8px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .rec-crowd-badge.High   { background: var(--high); }
-    .rec-crowd-badge.Medium { background: var(--medium); }
-    .rec-crowd-badge.Low    { background: var(--low); }
-
-    .rec-info { padding: 10px 12px; }
-    .rec-info .rec-name { font-size: 13px; font-weight: 700; color: var(--text); }
-    .rec-info .rec-city { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-    .rec-stats {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 8px;
-    }
-
-    .rec-stat { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 3px; }
-    .rec-stat span { font-weight: 600; color: var(--text); }
-
-    /* No recs */
-    .no-rec-tip {
-      padding: 16px 20px;
-      margin: 0 12px 12px;
-      background: #EFF6FF;
-      border-radius: 10px;
-      font-size: 13px;
-      color: #1D4ED8;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    /* ── LOADING ────────────────────────────────── */
-    .loading-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(255,255,255,0.7);
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .loading-overlay.active { display: flex; }
-
-    .spinner {
-      width: 48px; height: 48px;
-      border: 4px solid var(--border);
-      border-top-color: var(--saffron);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── TOAST ──────────────────────────────────── */
-    .toast {
-      position: fixed;
-      bottom: 24px; right: 24px;
-      background: #1E293B;
-      color: #fff;
-      padding: 12px 18px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 500;
-      z-index: 300;
-      transform: translateY(80px);
-      opacity: 0;
-      transition: all 0.3s;
-    }
-
-    .toast.show { transform: translateY(0); opacity: 1; }
-
-    /* ── MOBILE ─────────────────────────────────── */
-    @media (max-width: 900px) {
-      .sidebar { display: none; }
-      .main { margin-left: 0; padding: 16px; }
-      .content-grid { grid-template-columns: 1fr; }
-
-      .mobile-nav {
-        display: flex !important;
-        position: fixed;
-        bottom: 0; left: 0; right: 0;
-        background: var(--navy);
-        padding: 8px 0 12px;
-        z-index: 100;
-      }
-
-      .mobile-nav a {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 3px;
-        color: #64748B;
-        font-size: 10px;
-        font-weight: 600;
-        text-decoration: none;
-      }
-
-      .mobile-nav a.active { color: var(--saffron); }
-      .mobile-nav a span { font-size: 20px; }
-
-      .main { padding-bottom: 80px; }
-    }
-
-    .mobile-nav { display: none; }
-
-    /* ── ANIMATIONS ─────────────────────────────── */
-    .fade-in {
-      animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--navy:#1B2A4A;--saffron:#F97316;--saffron2:#EA6A04;--high:#EF4444;--medium:#F97316;--low:#22C55E;--bg:#F0F4F8;--card:#FFFFFF;--text:#1E293B;--muted:#64748B;--border:#E2E8F0;--radius:14px}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex}
+    .sidebar{width:220px;min-height:100vh;background:var(--navy);display:flex;flex-direction:column;padding:24px 16px;position:fixed;top:0;left:0;z-index:100}
+    .sidebar-logo{display:flex;align-items:center;gap:10px;margin-bottom:36px;padding:0 8px}
+    .logo-icon{width:36px;height:36px;background:var(--saffron);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+    .logo-text h2{color:#fff;font-size:14px;font-weight:700;line-height:1.2}
+    .logo-text p{color:#94A3B8;font-size:11px}
+    .nav-section{flex:1}
+    .nav-label{color:#64748B;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:0 8px;margin-bottom:8px;margin-top:16px}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;color:#94A3B8;font-size:14px;font-weight:500;transition:all 0.2s;margin-bottom:2px;text-decoration:none}
+    .nav-item:hover{background:rgba(255,255,255,0.07);color:#fff}
+    .nav-item.active{background:var(--saffron);color:#fff}
+    .nav-item .icon{width:18px;text-align:center;font-size:16px}
+    .sidebar-user{display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;background:rgba(255,255,255,0.05);margin-top:16px}
+    .user-avatar{width:34px;height:34px;background:var(--saffron);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff}
+    .user-info p{color:#fff;font-size:13px;font-weight:600}
+    .user-info span{color:#64748B;font-size:11px}
+    .main{margin-left:220px;flex:1;padding:28px;min-height:100vh}
+    .page-header{margin-bottom:24px}
+    .page-header h1{font-size:22px;font-weight:800;color:var(--text)}
+    .page-header p{color:var(--muted);font-size:14px;margin-top:4px}
+    .content-grid{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}
+    .search-panel{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+    .form-group{margin-bottom:18px}
+    .form-label{display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px}
+    .search-wrapper{position:relative}
+    .search-input{width:100%;padding:11px 40px 11px 38px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text);background:#F8FAFC;transition:border-color 0.2s;outline:none}
+    .search-input:focus{border-color:var(--saffron);background:#fff}
+    .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px}
+    .search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--muted);font-size:16px;display:none}
+    .autocomplete-list{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.1);z-index:50;max-height:260px;overflow-y:auto;display:none}
+    .autocomplete-item{padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:14px;transition:background 0.15s}
+    .autocomplete-item:hover{background:#F8FAFC}
+    .place-emoji{font-size:16px;width:22px;text-align:center}
+    .place-name{font-weight:600;color:var(--text)}
+    .place-loc{font-size:12px;color:var(--muted)}
+    .date-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text);background:#F8FAFC;outline:none;cursor:pointer;transition:border-color 0.2s}
+    .date-input:focus{border-color:var(--saffron);background:#fff}
+    .time-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+    .time-btn{padding:10px 8px;border:1.5px solid var(--border);border-radius:10px;background:#F8FAFC;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--muted);transition:all 0.2s;text-align:center}
+    .time-btn:hover{border-color:var(--saffron);color:var(--saffron);background:#fff}
+    .time-btn.active{background:var(--saffron);color:#fff;border-color:var(--saffron)}
+    .time-btn .t-emoji{display:block;font-size:20px;margin-bottom:3px}
+    .time-btn .t-label{display:block;font-size:11px;font-weight:500}
+    .predict-btn{width:100%;padding:13px;background:var(--saffron);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:background 0.2s,transform 0.1s;display:flex;align-items:center;justify-content:center;gap:8px}
+    .predict-btn:hover{background:var(--saffron2)}
+    .predict-btn:active{transform:scale(0.99)}
+    .predict-btn:disabled{background:#CBD5E1;cursor:not-allowed}
+    .popular-section{margin-top:20px}
+    .popular-title{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:10px}
+    .popular-chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{padding:6px 12px;background:#F1F5F9;border-radius:20px;font-size:12px;font-weight:500;color:var(--text);cursor:pointer;transition:all 0.2s;border:1.5px solid transparent}
+    .chip:hover{background:#fff;border-color:var(--saffron);color:var(--saffron)}
+    .how-box{margin-top:20px;padding:14px;background:#EFF6FF;border-radius:10px;border-left:3px solid #3B82F6}
+    .how-box h4{font-size:13px;font-weight:700;color:#1E40AF;margin-bottom:4px}
+    .how-box p{font-size:12px;color:#1D4ED8;line-height:1.5}
+    .results-panel{display:flex;flex-direction:column;gap:16px}
+    .empty-state{background:var(--card);border-radius:var(--radius);padding:60px 40px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+    .empty-state .empty-icon{font-size:48px;margin-bottom:16px}
+    .empty-state h3{font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px}
+    .empty-state p{font-size:14px;color:var(--muted);line-height:1.6}
+    .result-card{background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+    .result-card-header{display:flex;align-items:center;gap:16px;padding:20px;border-bottom:1px solid var(--border)}
+    .place-image{width:70px;height:70px;border-radius:10px;background:linear-gradient(135deg,#1B2A4A,#3B5998);display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0}
+    .place-meta h2{font-size:18px;font-weight:800;color:var(--text)}
+    .place-meta .location{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--muted);margin-top:4px}
+    .place-meta .type-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:#F1F5F9;border-radius:20px;font-size:11px;font-weight:600;color:var(--muted);margin-top:6px}
+    .prediction-section{padding:20px;display:flex;align-items:center;gap:20px;border-bottom:1px solid var(--border)}
+    .prediction-for{flex:1}
+    .pred-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px}
+    .pred-date{font-size:18px;font-weight:800;color:var(--text);margin-top:4px}
+    .pred-time{font-size:13px;color:var(--muted);margin-top:4px;font-weight:500}
+    .crowd-badge{display:flex;align-items:center;gap:10px;padding:14px 20px;border-radius:12px;min-width:140px}
+    .crowd-badge.high{background:#FEF2F2}
+    .crowd-badge.medium{background:#FFF7ED}
+    .crowd-badge.low{background:#F0FDF4}
+    .crowd-badge .badge-icon{font-size:24px}
+    .crowd-badge .badge-label{font-size:20px;font-weight:800}
+    .crowd-badge.high .badge-label{color:var(--high)}
+    .crowd-badge.medium .badge-label{color:var(--medium)}
+    .crowd-badge.low .badge-label{color:var(--low)}
+    .crowd-badge .badge-sub{font-size:11px;font-weight:600;color:var(--muted);margin-top:2px}
+    .confidence-section{padding:14px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+    .conf-label{font-size:13px;font-weight:600;color:var(--muted);min-width:90px}
+    .conf-bar-wrap{flex:1;background:#F1F5F9;border-radius:20px;height:8px;overflow:hidden}
+    .conf-bar{height:100%;border-radius:20px;transition:width 0.6s ease}
+    .conf-value{font-size:15px;font-weight:800;color:var(--text);min-width:44px;text-align:right}
+    .reason-section{padding:14px 20px;border-bottom:1px solid var(--border)}
+    .reason-box{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:10px;font-size:13px;font-weight:500;margin-bottom:6px}
+    .reason-box:last-child{margin-bottom:0}
+    .reason-box.high{background:#FEF2F2;color:#991B1B}
+    .reason-box.medium{background:#FFF7ED;color:#92400E}
+    .reason-box.low{background:#F0FDF4;color:#14532D}
+    .tip-section{padding:14px 20px;border-bottom:1px solid var(--border)}
+    .tip-box{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:#EFF6FF;border-radius:10px;font-size:13px;font-weight:500;color:#1D4ED8}
+    .holiday-box{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#FEF9C3;border-radius:10px;font-size:13px;font-weight:600;color:#854D0E;margin:0 20px 14px}
+    .rec-card{background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+    .rec-card-header{padding:18px 20px 12px;display:flex;align-items:center;justify-content:space-between}
+    .rec-card-header h3{font-size:16px;font-weight:700;color:var(--text)}
+    .rec-card-header p{font-size:13px;color:var(--muted);margin-top:2px}
+    .view-map-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:#EFF6FF;border-radius:8px;font-size:13px;font-weight:600;color:#2563EB;cursor:pointer;border:none;font-family:'Inter',sans-serif;text-decoration:none;white-space:nowrap}
+    .view-map-btn:hover{background:#DBEAFE}
+    .rec-list{padding:0 12px 12px;display:flex;gap:12px;overflow-x:auto}
+    .rec-list::-webkit-scrollbar{height:4px}
+    .rec-list::-webkit-scrollbar-track{background:#F1F5F9}
+    .rec-list::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:4px}
+    .rec-item{min-width:180px;max-width:180px;background:#F8FAFC;border-radius:12px;overflow:hidden;border:1.5px solid var(--border);cursor:pointer;transition:all 0.2s;flex-shrink:0}
+    .rec-item:hover{border-color:var(--saffron);box-shadow:0 4px 12px rgba(249,115,22,0.1)}
+    .rec-img{width:100%;height:90px;background:linear-gradient(135deg,#1B2A4A,#3B5998);display:flex;align-items:center;justify-content:center;font-size:36px;position:relative}
+    .rec-crowd-badge{position:absolute;top:8px;right:8px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700;color:#fff}
+    .rec-crowd-badge.High{background:var(--high)}
+    .rec-crowd-badge.Medium{background:var(--medium)}
+    .rec-crowd-badge.Low{background:var(--low)}
+    .rec-info{padding:10px 12px}
+    .rec-info .rec-name{font-size:13px;font-weight:700;color:var(--text)}
+    .rec-info .rec-city{font-size:11px;color:var(--muted);margin-top:2px}
+    .rec-stats{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+    .rec-stat{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:3px}
+    .rec-stat span{font-weight:600;color:var(--text)}
+    .no-rec-tip{padding:16px 20px;margin:0 12px 12px;background:#EFF6FF;border-radius:10px;font-size:13px;color:#1D4ED8;font-weight:500;display:flex;align-items:center;gap:10px}
+    .loading-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.7);z-index:200;align-items:center;justify-content:center}
+    .loading-overlay.active{display:flex}
+    .spinner{width:48px;height:48px;border:4px solid var(--border);border-top-color:var(--saffron);border-radius:50%;animation:spin 0.8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .toast{position:fixed;bottom:24px;right:24px;background:#1E293B;color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:500;z-index:300;transform:translateY(80px);opacity:0;transition:all 0.3s}
+    .toast.show{transform:translateY(0);opacity:1}
+    @media(max-width:900px){
+      .sidebar{display:none}.main{margin-left:0;padding:16px}
+      .content-grid{grid-template-columns:1fr}
+      .mobile-nav{display:flex !important;position:fixed;bottom:0;left:0;right:0;background:var(--navy);padding:8px 0 12px;z-index:100}
+      .mobile-nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:#64748B;font-size:10px;font-weight:600;text-decoration:none}
+      .mobile-nav a.active{color:var(--saffron)}
+      .mobile-nav a span{font-size:20px}
+      .main{padding-bottom:80px}
+    }
+    .mobile-nav{display:none}
+    .fade-in{animation:fadeIn 0.3s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
   </style>
 </head>
 <body>
 
-<!-- Sidebar -->
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="logo-icon">🗺️</div>
-    <div class="logo-text">
-      <h2>Crowd Forecast</h2>
-      <p>India Tourism</p>
-    </div>
+    <div class="logo-text"><h2>Crowd Forecast</h2><p>India Tourism</p></div>
   </div>
-
   <nav class="nav-section">
     <div class="nav-label">Menu</div>
-    <a class="nav-item active" href="#">
-      <span class="icon">🏠</span> Home
-    </a>
-    <a class="nav-item" href="#" onclick="showShap(); return false;">
-      <span class="icon">📊</span> Model Insights
-    </a>
-    <a class="nav-item" href="#">
-      <span class="icon">📍</span> Saved Places
-    </a>
-    <a class="nav-item" href="#">
-      <span class="icon">ℹ️</span> About
-    </a>
+    <a class="nav-item active" href="#"><span class="icon">🏠</span> Home</a>
+    <a class="nav-item" href="#" onclick="showShap();return false;"><span class="icon">📊</span> Model Insights</a>
+    <a class="nav-item" href="#"><span class="icon">📍</span> Saved Places</a>
+    <a class="nav-item" href="#"><span class="icon">ℹ️</span> About</a>
   </nav>
-
   <div class="sidebar-user">
     <div class="user-avatar">HK</div>
-    <div class="user-info">
-      <p>Harsh Kumar</p>
-      <span>Data Scientist</span>
-    </div>
+    <div class="user-info"><p>Harsh Kumar</p><span>Data Scientist</span></div>
   </div>
 </aside>
 
-<!-- Mobile nav -->
 <nav class="mobile-nav">
   <a href="#" class="active"><span>🏠</span>Home</a>
-  <a href="#" onclick="showShap(); return false;"><span>📊</span>Insights</a>
+  <a href="#" onclick="showShap();return false;"><span>📊</span>Insights</a>
   <a href="#"><span>📍</span>Saved</a>
   <a href="#"><span>ℹ️</span>About</a>
 </nav>
 
-<!-- Main -->
 <main class="main">
   <div class="page-header">
-    <h1>Predict Crowd for Any Month</h1>
-    <p>Get crowd predictions for 12,655 Indian tourist places up to 6 months ahead.</p>
+    <h1>Predict Crowd for Any Date & Time</h1>
+    <p>Get crowd predictions for 12,655 Indian tourist places — pick a specific date and time of day.</p>
   </div>
 
   <div class="content-grid">
-
-    <!-- Search Panel -->
     <div class="search-panel">
+
       <div class="form-group">
         <label class="form-label">Search Place</label>
         <div class="search-wrapper">
           <span class="search-icon">🔍</span>
           <input type="text" class="search-input" id="searchInput"
-                 placeholder="e.g. Taj Mahal, Goa Beaches..."
-                 autocomplete="off"/>
+                 placeholder="e.g. Taj Mahal, Goa Beaches..." autocomplete="off"/>
           <span class="search-clear" id="searchClear" onclick="clearSearch()">✕</span>
           <div class="autocomplete-list" id="autoList"></div>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Select Month & Year</label>
-        <div class="month-year-row">
-          <select class="select-input" id="monthSelect">
-            <option value="1">January</option>
-            <option value="2">February</option>
-            <option value="3">March</option>
-            <option value="4">April</option>
-            <option value="5">May</option>
-            <option value="6">June</option>
-            <option value="7">July</option>
-            <option value="8">August</option>
-            <option value="9">September</option>
-            <option value="10" selected>October</option>
-            <option value="11">November</option>
-            <option value="12">December</option>
-          </select>
-          <select class="select-input" id="yearSelect">
-            <option value="2025">2025</option>
-            <option value="2026" selected>2026</option>
-            <option value="2027">2027</option>
-          </select>
+        <label class="form-label">Select Date</label>
+        <input type="date" class="date-input" id="dateInput"/>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Select Time of Day</label>
+        <div class="time-grid">
+          <button class="time-btn" data-time="morning" onclick="selectTime('morning')">
+            <span class="t-emoji">🌅</span>
+            <span>Morning</span>
+            <span class="t-label">6am – 12pm</span>
+          </button>
+          <button class="time-btn active" data-time="afternoon" onclick="selectTime('afternoon')">
+            <span class="t-emoji">☀️</span>
+            <span>Afternoon</span>
+            <span class="t-label">12pm – 5pm</span>
+          </button>
+          <button class="time-btn" data-time="evening" onclick="selectTime('evening')">
+            <span class="t-emoji">🌆</span>
+            <span>Evening</span>
+            <span class="t-label">5pm – 9pm</span>
+          </button>
+          <button class="time-btn" data-time="night" onclick="selectTime('night')">
+            <span class="t-emoji">🌙</span>
+            <span>Night</span>
+            <span class="t-label">9pm – 12am</span>
+          </button>
         </div>
       </div>
 
@@ -831,81 +239,74 @@
 
       <div class="how-box">
         <h4>How it works?</h4>
-        <p>We analyse festival calendars, real weather patterns, and Google search trends to predict crowd levels for any month.</p>
+        <p>We analyse festival calendars, real weather patterns, Google search trends, and hourly busyness patterns to predict crowd levels for any date and time.</p>
       </div>
     </div>
 
-    <!-- Results Panel -->
     <div class="results-panel" id="resultsPanel">
       <div class="empty-state fade-in">
         <div class="empty-icon">🗺️</div>
         <h3>Search for a place to begin</h3>
-        <p>Enter any of the 12,655 Indian tourist destinations above and select a month to get a crowd prediction with smart recommendations.</p>
+        <p>Enter any Indian tourist destination, pick a date and time of day to get a crowd prediction with smart recommendations.</p>
       </div>
     </div>
-
   </div>
 </main>
 
-<!-- Loading -->
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="spinner"></div>
-</div>
-
-<!-- Toast -->
+<div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
-  // ── State ─────────────────────────────────────
   let selectedPlace = null;
+  let selectedTime  = 'afternoon';
   let autoTimeout   = null;
 
-  // ── Init ──────────────────────────────────────
   document.addEventListener('DOMContentLoaded', () => {
     loadPopular();
-    setDefaultMonth();
+    setDefaultDate();
     document.getElementById('searchInput').addEventListener('input', onSearch);
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.search-wrapper')) closeAuto();
-    });
+    document.addEventListener('click', (e) => { if(!e.target.closest('.search-wrapper')) closeAuto(); });
   });
 
-  function setDefaultMonth() {
+  function setDefaultDate() {
     const now = new Date();
-    const m   = now.getMonth() + 2; // next month
-    const sel = document.getElementById('monthSelect');
-    sel.value = m > 12 ? 1 : m;
-    document.getElementById('yearSelect').value = now.getFullYear();
+    now.setDate(now.getDate() + 7);
+    const y = now.getFullYear();
+    const m = String(now.getMonth()+1).padStart(2,'0');
+    const d = String(now.getDate()).padStart(2,'0');
+    document.getElementById('dateInput').value = `${y}-${m}-${d}`;
+    const today = new Date();
+    const ty = today.getFullYear();
+    const tm = String(today.getMonth()+1).padStart(2,'0');
+    const td = String(today.getDate()).padStart(2,'0');
+    document.getElementById('dateInput').min = `${ty}-${tm}-${td}`;
+    document.getElementById('dateInput').max = '2027-12-31';
   }
 
-  // ── Popular Places ─────────────────────────────
+  function selectTime(time) {
+    selectedTime = time;
+    document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[data-time="${time}"]`).classList.add('active');
+  }
+
   async function loadPopular() {
     try {
       const res  = await fetch('/api/popular');
       const data = await res.json();
       const wrap = document.getElementById('popularChips');
       wrap.innerHTML = data.map(p =>
-        `<div class="chip" onclick="selectPlace(${JSON.stringify(p).replace(/"/g, '&quot;')})">
+        `<div class="chip" onclick="selectPlace(${JSON.stringify(p).replace(/"/g,'&quot;')})">
           ${p.emoji} ${p.name.split(',')[0]}
-        </div>`
-      ).join('');
-    } catch (e) {
-      console.error('Popular places error:', e);
-    }
+        </div>`).join('');
+    } catch(e) { console.error(e); }
   }
 
-  // ── Search ────────────────────────────────────
   function onSearch(e) {
     const q = e.target.value.trim();
     document.getElementById('searchClear').style.display = q ? 'block' : 'none';
-
-    if (q !== (selectedPlace?.name || '')) {
-      selectedPlace = null;
-      document.getElementById('predictBtn').disabled = true;
-    }
-
+    if(q !== (selectedPlace?.name || '')) { selectedPlace=null; document.getElementById('predictBtn').disabled=true; }
     clearTimeout(autoTimeout);
-    if (q.length < 2) { closeAuto(); return; }
+    if(q.length<2) { closeAuto(); return; }
     autoTimeout = setTimeout(() => fetchAuto(q), 200);
   }
 
@@ -914,69 +315,58 @@
       const res  = await fetch(`/api/search?q=${encodeURIComponent(q)}&limit=10`);
       const data = await res.json();
       showAuto(data);
-    } catch (e) { console.error(e); }
+    } catch(e) { console.error(e); }
   }
 
   function showAuto(places) {
     const list = document.getElementById('autoList');
-    if (!places.length) { list.style.display = 'none'; return; }
-
+    if(!places.length) { list.style.display='none'; return; }
     list.innerHTML = places.map(p => `
-      <div class="autocomplete-item"
-           onclick='selectPlace(${JSON.stringify(p).replace(/'/g, "\\'")})'>
+      <div class="autocomplete-item" onclick='selectPlace(${JSON.stringify(p).replace(/'/g,"\\'")})'>
         <span class="place-emoji">${p.emoji}</span>
         <div>
           <div class="place-name">${p.name}</div>
           <div class="place-loc">${p.city}, ${p.state}</div>
         </div>
-      </div>
-    `).join('');
-    list.style.display = 'block';
+      </div>`).join('');
+    list.style.display='block';
   }
 
-  function closeAuto() {
-    document.getElementById('autoList').style.display = 'none';
-  }
+  function closeAuto() { document.getElementById('autoList').style.display='none'; }
 
   function selectPlace(place) {
     selectedPlace = place;
     document.getElementById('searchInput').value = `${place.name}, ${place.city}`;
-    document.getElementById('searchClear').style.display = 'block';
-    document.getElementById('predictBtn').disabled = false;
+    document.getElementById('searchClear').style.display='block';
+    document.getElementById('predictBtn').disabled=false;
     closeAuto();
   }
 
   function clearSearch() {
-    selectedPlace = null;
-    document.getElementById('searchInput').value = '';
-    document.getElementById('searchClear').style.display = 'none';
-    document.getElementById('predictBtn').disabled = true;
+    selectedPlace=null;
+    document.getElementById('searchInput').value='';
+    document.getElementById('searchClear').style.display='none';
+    document.getElementById('predictBtn').disabled=true;
     closeAuto();
   }
 
-  // ── Predict ───────────────────────────────────
   async function predict() {
-    if (!selectedPlace) { showToast('Please select a place first'); return; }
-
-    const month = document.getElementById('monthSelect').value;
-    const year  = document.getElementById('yearSelect').value;
+    if(!selectedPlace) { showToast('Please select a place first'); return; }
+    const dateVal = document.getElementById('dateInput').value;
+    if(!dateVal) { showToast('Please select a date'); return; }
 
     showLoading(true);
-
     try {
+      const month = new Date(dateVal).getMonth()+1;
       const [predRes, recRes] = await Promise.all([
-        fetch(`/api/predict?place_id=${selectedPlace.place_id}&month=${month}&year=${year}`),
+        fetch(`/api/predict?place_id=${selectedPlace.place_id}&date=${dateVal}&time=${selectedTime}`),
         fetch(`/api/recommend?place_id=${selectedPlace.place_id}&month=${month}`)
       ]);
-
       const pred = await predRes.json();
       const recs = await recRes.json();
-
-      if (pred.error) { showToast(pred.error); return; }
-
+      if(pred.error) { showToast(pred.error); return; }
       renderResults(pred, recs);
-
-    } catch (e) {
+    } catch(e) {
       console.error(e);
       showToast('Something went wrong. Please try again.');
     } finally {
@@ -984,73 +374,59 @@
     }
   }
 
-  // ── Render Results ────────────────────────────
   function renderResults(pred, recs) {
-    const panel   = document.getElementById('resultsPanel');
-    const cls     = pred.label.toLowerCase();
-    const mapUrl  = `https://www.openstreetmap.org/?mlat=${pred.lat}&mlon=${pred.lon}#map=14/${pred.lat}/${pred.lon}`;
+    const panel  = document.getElementById('resultsPanel');
+    const cls    = pred.label.toLowerCase();
+    const mapUrl = `https://www.openstreetmap.org/?mlat=${pred.lat}&mlon=${pred.lon}#map=14/${pred.lat}/${pred.lon}`;
+
+    // Format display date
+    const dt = new Date(pred.date+'T12:00:00');
+    const dateDisplay = dt.toLocaleDateString('en-IN', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
     const reasonsHTML = pred.reasons.map(r =>
-      `<div class="reason-box ${cls}">
-        <span>💡</span>
-        <span>${r}</span>
-      </div>`
-    ).join('');
+      `<div class="reason-box ${cls}"><span>💡</span><span>${r}</span></div>`).join('');
+
+    const holidayHTML = pred.holiday
+      ? `<div class="holiday-box"><span>🎉</span><strong>Public Holiday:</strong> ${pred.holiday} — expect extra crowds!</div>` : '';
 
     const tipHTML = pred.month_tip
-      ? `<div class="tip-section">
-           <div class="tip-box">
-             <span>📅</span>
-             <span>${pred.month_tip.text}</span>
-           </div>
-         </div>`
-      : '';
+      ? `<div class="tip-section"><div class="tip-box"><span>📅</span><span>${pred.month_tip.text}</span></div></div>` : '';
 
-    const confColor = pred.label === 'High' ? '#EF4444'
-                    : pred.label === 'Low'  ? '#22C55E' : '#F97316';
+    const confColor = pred.label==='High'?'#EF4444':pred.label==='Low'?'#22C55E':'#F97316';
+
+    const timeInfo = pred.time_label
+      ? `${pred.time_emoji} ${pred.time_label}` : '';
+
+    const weekendBadge = pred.is_weekend
+      ? '<span style="background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;margin-left:8px;">Weekend</span>'
+      : '<span style="background:#F1F5F9;color:#64748B;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;margin-left:8px;">Weekday</span>';
 
     const recsHTML = recs.length > 0
-      ? `<div class="rec-list">
-          ${recs.map(r => `
-            <div class="rec-item" onclick='selectAndPredict(${JSON.stringify(r)})'>
-              <div class="rec-img">
-                ${r.emoji}
-                <span class="rec-crowd-badge ${r.crowd}">${r.crowd}</span>
-              </div>
-              <div class="rec-info">
-                <div class="rec-name">${r.place_name}</div>
-                <div class="rec-city">${r.city}, ${r.state}</div>
-                <div class="rec-stats">
-                  <span class="rec-stat">⭐ <span>${r.rating || 'N/A'}</span></span>
-                  <span class="rec-stat">📍 <span>${r.distance}km</span></span>
-                </div>
+      ? `<div class="rec-list">${recs.map(r=>`
+          <div class="rec-item" onclick='selectAndPredict(${JSON.stringify(r)})'>
+            <div class="rec-img">${r.emoji}<span class="rec-crowd-badge ${r.crowd}">${r.crowd}</span></div>
+            <div class="rec-info">
+              <div class="rec-name">${r.place_name}</div>
+              <div class="rec-city">${r.city}, ${r.state}</div>
+              <div class="rec-stats">
+                <span class="rec-stat">⭐ <span>${r.rating||'N/A'}</span></span>
+                <span class="rec-stat">📍 <span>${r.distance}km</span></span>
               </div>
             </div>
-          `).join('')}
-        </div>`
-      : `<div class="no-rec-tip">
-           📅 No less crowded alternatives nearby this month.
-           ${pred.month_tip ? `<strong>${pred.month_tip.text}</strong>` : 'Try a different month for alternatives.'}
-         </div>`;
+          </div>`).join('')}</div>`
+      : `<div class="no-rec-tip">📅 No less crowded alternatives nearby. ${pred.month_tip?`<strong>${pred.month_tip.text}</strong>`:'Try a different date.'}</div>`;
 
     panel.innerHTML = `
-      <!-- Place + Prediction Card -->
       <div class="result-card fade-in">
-
         <div class="result-card-header">
           <div class="place-image">${pred.emoji}</div>
           <div class="place-meta">
             <h2>${pred.place_name}</h2>
-            <div class="location">
-              <span>📍</span>
-              <span>${pred.city}, ${pred.state}</span>
-            </div>
+            <div class="location"><span>📍</span><span>${pred.city}, ${pred.state}</span></div>
             <span class="type-badge">${pred.emoji} ${pred.place_type}</span>
           </div>
           <button onclick="window.open('${mapUrl}','_blank')"
-                  style="margin-left:auto; padding:8px 14px; background:#F1F5F9;
-                         border:none; border-radius:8px; font-size:12px;
-                         font-weight:600; cursor:pointer; color:#475569; white-space:nowrap;">
+                  style="margin-left:auto;padding:8px 14px;background:#F1F5F9;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;color:#475569;white-space:nowrap;">
             🗺️ View Map
           </button>
         </div>
@@ -1058,7 +434,8 @@
         <div class="prediction-section">
           <div class="prediction-for">
             <div class="pred-label">Predicted Crowd for</div>
-            <div class="pred-date">${pred.month_name} ${pred.year}</div>
+            <div class="pred-date">${dateDisplay} ${weekendBadge}</div>
+            <div class="pred-time">${timeInfo}</div>
           </div>
           <div class="crowd-badge ${cls}">
             <span class="badge-icon">${pred.icon}</span>
@@ -1071,93 +448,51 @@
 
         <div class="confidence-section">
           <span class="conf-label">Confidence</span>
-          <div class="conf-bar-wrap">
-            <div class="conf-bar"
-                 style="width:${pred.confidence}%; background:${confColor};"></div>
-          </div>
+          <div class="conf-bar-wrap"><div class="conf-bar" style="width:${pred.confidence}%;background:${confColor};"></div></div>
           <span class="conf-value">${pred.confidence}%</span>
         </div>
 
+        ${holidayHTML}
         <div class="reason-section">${reasonsHTML}</div>
-
         ${tipHTML}
-
       </div>
 
-      <!-- Recommendations -->
       <div class="rec-card fade-in">
         <div class="rec-card-header">
           <div>
             <h3>Places You Can Consider Instead</h3>
             <p>Similar places likely to be less crowded in ${pred.month_name}</p>
           </div>
-          <a href="${mapUrl}" target="_blank" class="view-map-btn">
-            🗺️ View on Map
-          </a>
+          <a href="${mapUrl}" target="_blank" class="view-map-btn">🗺️ View on Map</a>
         </div>
         ${recsHTML}
-      </div>
-    `;
+      </div>`;
   }
 
   function selectAndPredict(place) {
-    selectPlace({
-      place_id: place.place_id,
-      name    : place.place_name,
-      city    : place.city,
-      state   : place.state,
-      type    : place.place_type,
-      emoji   : place.emoji,
-    });
+    selectPlace({place_id:place.place_id,name:place.place_name,city:place.city,state:place.state,type:place.place_type,emoji:place.emoji});
     predict();
   }
 
-  // ── SHAP Modal ────────────────────────────────
   function showShap() {
     const overlay = document.createElement('div');
-    overlay.style.cssText = `
-      position:fixed; inset:0; background:rgba(0,0,0,0.6);
-      z-index:500; display:flex; align-items:center; justify-content:center;
-      padding:20px;
-    `;
-    overlay.innerHTML = `
-      <div style="background:#fff; border-radius:16px; overflow:hidden;
-                  max-width:700px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-        <div style="padding:16px 20px; border-bottom:1px solid #E2E8F0;
-                    display:flex; align-items:center; justify-content:space-between;">
-          <div>
-            <h3 style="font-size:16px; font-weight:700;">Model Feature Importance</h3>
-            <p style="font-size:13px; color:#64748B;">What drives crowd predictions (SHAP values)</p>
-          </div>
-          <button onclick="this.closest('div').parentElement.remove()"
-                  style="font-size:20px; background:none; border:none; cursor:pointer; color:#64748B;">✕</button>
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;';
+    overlay.innerHTML=`
+      <div style="background:#fff;border-radius:16px;overflow:hidden;max-width:700px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+        <div style="padding:16px 20px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;justify-content:space-between;">
+          <div><h3 style="font-size:16px;font-weight:700;">Model Feature Importance</h3>
+          <p style="font-size:13px;color:#64748B;">What drives crowd predictions (SHAP values)</p></div>
+          <button onclick="this.closest('div').parentElement.remove()" style="font-size:20px;background:none;border:none;cursor:pointer;color:#64748B;">✕</button>
         </div>
-        <img src="/api/shap" alt="SHAP Importance Chart"
-             style="width:100%; display:block; padding:16px;"
-             onerror="this.src='https://via.placeholder.com/600x400?text=SHAP+Chart'"/>
-        <div style="padding:12px 20px; background:#F8FAFC; font-size:12px; color:#64748B;">
-          Top driver: Festival signals (35%) — Real weather and search trends also major contributors.
-          LightGBM model | 90,108 test samples | 59 features
-        </div>
-      </div>
-    `;
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) overlay.remove();
-    });
+        <img src="/api/shap" alt="SHAP Chart" style="width:100%;display:block;padding:16px;"/>
+        <div style="padding:12px 20px;background:#F8FAFC;font-size:12px;color:#64748B;">Top driver: Festival signals (35%) — Real weather and search trends also major contributors.</div>
+      </div>`;
+    overlay.addEventListener('click',(e)=>{if(e.target===overlay)overlay.remove();});
     document.body.appendChild(overlay);
   }
 
-  // ── Utils ─────────────────────────────────────
-  function showLoading(on) {
-    document.getElementById('loadingOverlay').classList.toggle('active', on);
-  }
-
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3000);
-  }
+  function showLoading(on){document.getElementById('loadingOverlay').classList.toggle('active',on)}
+  function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
 </script>
 </body>
 </html>
