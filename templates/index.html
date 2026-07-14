@@ -404,7 +404,7 @@
     const recsHTML = recs.length > 0
       ? `<div class="rec-list">${recs.map(r=>`
           <div class="rec-item" onclick='selectAndPredict(${JSON.stringify(r)})'>
-            <div class="rec-img">${r.emoji}<span class="rec-crowd-badge ${r.crowd}">${r.crowd}</span></div>
+            <div class="rec-img">${r.emoji}<span class="rec-crowd-badge ${r.crowd}">${r.crowd} ${r.score ?? ''}</span></div>
             <div class="rec-info">
               <div class="rec-name">${r.place_name}</div>
               <div class="rec-city">${r.city}, ${r.state}</div>
@@ -442,6 +442,10 @@
             <div>
               <div class="badge-label">${pred.label}</div>
               <div class="badge-sub">${pred.label_text}</div>
+            </div>
+            <div style="margin-left:8px;padding-left:12px;border-left:1px solid rgba(0,0,0,0.1);text-align:center;">
+              <div style="font-size:26px;font-weight:800;line-height:1;color:${confColor};">${pred.score ?? '—'}</div>
+              <div style="font-size:10px;font-weight:600;color:var(--muted);margin-top:2px;">CROWD INDEX</div>
             </div>
           </div>
         </div>
