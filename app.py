@@ -1,7 +1,7 @@
 """
 Crowd Forecast — India Tourism
-Phase 2 Flask App — Date + Time Prediction
-12,655 tourist places | LightGBM 98.28% | Recommendation Engine
+Phase 2 Flask App — City-Seasonal Prediction (primary) + Date/Time refinement
+12,655 tourist places | City-season model (validated) | Recommendation Engine
 """
 
 import os
@@ -17,11 +17,12 @@ app = Flask(__name__)
 
 # ── Google Drive File IDs ─────────────────────────
 DRIVE = {
-    'rec_engine' : '10peKyAKIAGQNzMxSegTtKugUhpuwEy9y',
-    'model'      : '1VNfcK_GcdeNz726M8iE-D7sCYXiDqmDK',
-    'features'   : '1B7pCpjI1ezrwhjiLqS5ZbX8Sh5_IDa52',
-    'shap'       : '1gE68_5TaBhvY4sPw2M_9vYF04wINC9lT',
-    'time_lookup': '1ixpJYVEfcoPeqKTDglKBWTpu8XFmUnf-',
+    'rec_engine'  : '10peKyAKIAGQNzMxSegTtKugUhpuwEy9y',
+    'model'       : '1VNfcK_GcdeNz726M8iE-D7sCYXiDqmDK',
+    'features'    : '1B7pCpjI1ezrwhjiLqS5ZbX8Sh5_IDa52',
+    'shap'        : '1gE68_5TaBhvY4sPw2M_9vYF04wINC9lT',
+    'time_lookup' : '1ixpJYVEfcoPeqKTDglKBWTpu8XFmUnf-',
+    'city_season' : '1eGulojWQ_AeWojHdoUyX5TL87M5bUxAA',  # NEW: validated city-month scores
 }
 
 CACHE = '/tmp/crowd_cache'
@@ -47,7 +48,7 @@ with open(rec_path, 'rb') as f:
     ENGINE = pickle.load(f)
 
 PLACE_INFO = ENGINE['place_info_lookup']
-CROWD_LKP  = ENGINE['crowd_lookup']
+CROWD_LKP  = ENGINE['crowd_lookup']          # legacy place-level (kept as fallback only)
 REL_LKP    = ENGINE.get('relative_lookup', {})
 TOP_K      = ENGINE['top_k_similar']
 PLACE_IDX  = ENGINE['place_idx']
@@ -57,6 +58,17 @@ PLACE_LONS = ENGINE['place_lons']
 time_path = gdrive_get(DRIVE['time_lookup'], 'time_of_day_lookup.json')
 with open(time_path) as f:
     TIME_LKP = json.load(f)
+
+# NEW: validated city-seasonal scores (key format "City|Month" -> 0-100)
+city_path = gdrive_get(DRIVE['city_season'], 'city_season_scores.json')
+with open(city_path) as f:
+    CITY_SEASON = json.load(f)
+
+# build a lowercase city index for robust matching
+CITY_SEASON_LC = {}
+for k, v in CITY_SEASON.items():
+    city, m = k.rsplit('|', 1)
+    CITY_SEASON_LC[(city.lower().strip(), int(m))] = v
 
 SEARCH_INDEX = sorted([
     {
@@ -70,13 +82,39 @@ SEARCH_INDEX = sorted([
     for pid, info in PLACE_INFO.items()
 ], key=lambda x: x['name'])
 
-print(f'Ready: {len(PLACE_INFO):,} places | {len(TIME_LKP):,} time records')
+print(f'Ready: {len(PLACE_INFO):,} places | {len(CITY_SEASON):,} city-season scores')
 
 # ── Constants ─────────────────────────────────────
-CROWD_RANK  = {'Low': 0, 'Medium': 1, 'High': 2}
 CROWD_COLOR = {'High': '#EF4444', 'Medium': '#F97316', 'Low': '#22C55E'}
 CROWD_LABEL = {'High': 'Very Busy', 'Medium': 'Moderately Busy', 'Low': 'Less Crowded'}
 CROWD_ICON  = {'High': '🔴', 'Medium': '🟡', 'Low': '🟢'}
+CROWD_RANK  = {'Low': 0, 'Medium': 1, 'High': 2}
+
+# Label is derived by ranking a month against THAT CITY'S OWN yearly range.
+# This uses the within-city seasonal ordering we validated (peak>off = 100%),
+# rather than a global absolute threshold (which the raw scores don't support).
+def city_year_scores(city):
+    if not city: return []
+    return [CITY_SEASON_LC.get((city.lower().strip(), m)) for m in range(1,13)]
+
+def score_to_label_relative(city, score):
+    ys = [s for s in city_year_scores(city) if s is not None]
+    if not ys or score is None:
+        # fallback to absolute if no city curve
+        if score is None: return 'Medium'
+        return 'High' if score>=60 else ('Medium' if score>=33 else 'Low')
+    lo, hi = min(ys), max(ys)
+    if hi == lo: return 'Medium'
+    pct = (score - lo) / (hi - lo)
+    if pct >= 0.66: return 'High'
+    if pct >= 0.33: return 'Medium'
+    return 'Low'
+
+def score_to_label(score):
+    # kept for absolute fallback (unknown-city cases)
+    if score >= 60: return 'High'
+    if score >= 33: return 'Medium'
+    return 'Low'
 
 SEASONS = {
     12: 'Winter', 1: 'Winter', 2: 'Winter',
@@ -106,7 +144,7 @@ REASONS = {
         'Post-Monsoon':['Early peak season starting','Moderate festival activity','Growing search interest'],
     },
     'Low': {
-        'Winter'      :['Off-season for this place type','Visitors prefer other months','Lower seasonal interest'],
+        'Winter'      :['Off-season for this destination','Visitors prefer other months','Lower seasonal interest'],
         'Summer'      :['Peak heat reduces outdoor visits','Monsoon season approaching','Low search interest this month'],
         'Monsoon'     :['Monsoon reducing tourist footfall','Weather deterring visitors','Limited outdoor access'],
         'Post-Monsoon':['Early season tourists yet to arrive','Pre-festival quiet period','Moderate weather conditions'],
@@ -135,19 +173,35 @@ def haversine(lat1,lon1,lat2,lon2):
     a=math.sin((lat2-lat1)/2)**2+math.cos(lat1)*math.cos(lat2)*math.sin((lon2-lon1)/2)**2
     return R*2*math.asin(math.sqrt(max(0,min(1,a))))
 
-def get_crowd(place_id,month):
-    for pid in [place_id,str(place_id)]:
-        for m in [month,int(month)]:
-            v=CROWD_LKP.get((pid,m))
-            if v: return v
-    return 'Medium'
+def get_city_score(city, month):
+    """PRIMARY: validated city-seasonal score (0-100). Returns None if city unknown."""
+    if not city:
+        return None
+    return CITY_SEASON_LC.get((city.lower().strip(), int(month)))
 
-def get_relative(place_id,month):
-    for pid in [place_id,str(place_id)]:
-        for m in [month,int(month)]:
-            v=REL_LKP.get((pid,m))
-            if v: return v
-    return None
+def get_crowd_score(place_id, month):
+    """
+    Return (score, label) for a place in a month.
+    Primary source = city-seasonal score (validated).
+    Falls back to legacy place-level label only if city is unknown.
+    """
+    info = PLACE_INFO.get(place_id) or PLACE_INFO.get(str(place_id)) or {}
+    city = info.get('city', '')
+    score = get_city_score(city, month)
+    if score is not None:
+        return score, score_to_label_relative(city, score)
+    # fallback: legacy place-level label -> approximate score
+    for pid in [place_id, str(place_id)]:
+        for m in [month, int(month)]:
+            lbl = CROWD_LKP.get((pid, m))
+            if lbl:
+                approx = {'Low':20,'Medium':50,'High':80}.get(lbl, 50)
+                return approx, lbl
+    return 50.0, 'Medium'
+
+def get_crowd(place_id, month):
+    """Back-compat: label only."""
+    return get_crowd_score(place_id, month)[1]
 
 def get_place_coords(place_id):
     idx=PLACE_IDX.get(place_id) or PLACE_IDX.get(str(place_id))
@@ -157,14 +211,29 @@ def get_place_coords(place_id):
 def get_time_data(place_id):
     return TIME_LKP.get(str(place_id)) or TIME_LKP.get(place_id) or {}
 
-def compute_datetime_prediction(place_id,date_str,time_slot):
+def get_best_months(place_id, city, current_month):
+    """Least-crowded months for this city (from the validated seasonal curve)."""
+    scores = [(m, get_city_score(city, m)) for m in range(1,13)]
+    scores = [(m,s) for m,s in scores if s is not None]
+    if not scores:
+        return None
+    scores.sort(key=lambda x: x[1])
+    low_months = [m for m,s in scores[:3]]
+    if current_month in low_months:
+        return None  # already a quiet month
+    names = [calendar.month_abbr[m] for m in low_months]
+    return {'months': low_months, 'text': f"Visit in {', '.join(names)} for a quieter experience"}
+
+def compute_datetime_refinement(place_id, date_str, base_score):
+    """
+    Refine the city-season base score with day-of-week + time-of-day + holiday.
+    Returns adjusted (score, confidence, extra_reasons, meta).
+    This is a SECONDARY refinement on top of the validated city base.
+    """
     dt       = datetime.strptime(date_str,'%Y-%m-%d')
     month    = dt.month
     weekday  = dt.weekday()
     is_wkend = weekday >= 5
-
-    base_label = get_crowd(place_id,month)
-    base_rank  = CROWD_RANK.get(base_label,1)
 
     td           = get_time_data(place_id)
     busyness_avg = td.get('busyness_avg',40) or 40
@@ -174,50 +243,8 @@ def compute_datetime_prediction(place_id,date_str,time_slot):
     day_avg   = td.get(day_col,busyness_avg) or busyness_avg
     day_ratio = day_avg/busyness_avg if busyness_avg>0 else 1.0
 
-    time_col  = TIME_COL.get(time_slot,'afternoon_avg')
-    time_avg  = td.get(time_col,busyness_avg) or busyness_avg
-    time_ratio= time_avg/busyness_max if busyness_max>0 else 0.5
-
-    holiday_name  = PUBLIC_HOLIDAYS.get((month,dt.day))
-    holiday_boost = 0.15 if holiday_name else 0
-
-    same_label = sum(1 for m in range(1,13) if get_crowd(place_id,m)==base_label)
-    base_conf  = 0.60+(same_label/12)*0.20
-
-    day_adj  = +0.06 if day_ratio>1.15 else (-0.06 if day_ratio<0.85 else 0.0)
-    time_adj = +0.05 if time_ratio>0.7 else (-0.05 if time_ratio<0.3 else 0.0)
-    confidence = min(94,int((base_conf+day_adj+time_adj+holiday_boost)*100))
-
-    combined_ratio = day_ratio*(0.5+time_ratio*0.5)
-    final_label    = base_label
-    if base_label=='Medium':
-        if combined_ratio>1.3 or (is_wkend and time_ratio>0.6): final_label='High'
-        elif combined_ratio<0.7: final_label='Low'
-    elif base_label=='High' and combined_ratio<0.6: final_label='Medium'
-    elif base_label=='Low' and combined_ratio>1.4 and is_wkend: final_label='Medium'
-
-    season  = SEASONS.get(month,'Winter')
-    reasons = list(REASONS.get(final_label,{}).get(season,['Seasonal crowd pattern']))
-    if is_wkend: reasons.append(f"{DAY_NAME[weekday]} — weekend crowds expected")
-    else: reasons.append(f"{DAY_NAME[weekday]} — typically quieter than weekends")
-    if time_ratio>0.6: reasons.append(f"{TIME_LABEL[time_slot]} is peak time at this place")
-    elif time_ratio<0.3: reasons.append(f"{TIME_LABEL[time_slot]} is off-peak at this place")
-    if holiday_name: reasons.append(f"Public holiday: {holiday_name}")
-
-    return {
-        'label'     :final_label,'base_label':base_label,
-        'confidence':confidence,'day_name'  :DAY_NAME[weekday],
-        'is_weekend':is_wkend,  'time_slot' :time_slot,
-        'time_label':TIME_LABEL[time_slot],'time_emoji':TIME_EMOJI[time_slot],
-        'season'    :season,'reasons'  :reasons[:4],'holiday':holiday_name,
-    }
-
-def get_month_tip(place_id,current_month):
-    low_months=[m for m in range(1,13) if get_relative(place_id,m)=='Low']
-    if low_months and current_month not in low_months:
-        names=[calendar.month_abbr[m] for m in low_months[:3]]
-        return {'months':low_months[:3],'text':f"Visit in {', '.join(names)} for least crowded experience"}
-    return None
+    time_slot = None  # filled by caller
+    return dt, month, weekday, is_wkend, day_ratio, td, busyness_max
 
 
 # ── Routes ─────────────────────────────────────────
@@ -261,39 +288,75 @@ def predict():
     info=PLACE_INFO.get(place_id) or PLACE_INFO.get(str(place_id))
     if not info: return jsonify({'error':'Place not found'}),404
 
+    city = info.get('city','')
     lat,lon=get_place_coords(place_id)
 
+    # optional date parsing (for date+time refinement)
+    weekday=None; is_weekend=None; day_name=None
+    time_label=None; time_emoji=None; holiday=None
     if date_str:
         try:
-            dt    =datetime.strptime(date_str,'%Y-%m-%d')
-            month =dt.month; year=dt.year
-            pred  =compute_datetime_prediction(place_id,date_str,time_slot)
-            label      =pred['label']; confidence=pred['confidence']
-            reasons    =pred['reasons']; day_name  =pred['day_name']
-            time_label =pred['time_label']; time_emoji=pred['time_emoji']
-            holiday    =pred['holiday']; is_weekend=pred['is_weekend']
-            base_label =pred['base_label']
+            dt=datetime.strptime(date_str,'%Y-%m-%d')
+            month=dt.month; year=dt.year
+            weekday=dt.weekday(); is_weekend=weekday>=5
+            day_name=DAY_NAME[weekday]
+            time_label=TIME_LABEL.get(time_slot); time_emoji=TIME_EMOJI.get(time_slot)
+            holiday=PUBLIC_HOLIDAYS.get((month,dt.day))
         except Exception as e:
-            print(f'Date error: {e}'); date_str=''
+            print(f'Date parse error: {e}'); date_str=''
 
-    if not date_str:
-        label     =get_crowd(place_id,month)
-        confidence=min(94,65+sum(1 for m in range(1,13) if get_crowd(place_id,m)==label))
-        season    =SEASONS.get(month,'Winter')
-        reasons   =list(REASONS.get(label,{}).get(season,['Seasonal crowd pattern']))
-        day_name  =None; time_label=None; time_emoji=None
-        holiday   =None; is_weekend=None; base_label=label
+    # ── PRIMARY: validated city-seasonal score ──
+    base_score, base_label = get_crowd_score(place_id, month)
+    score = base_score
 
-    tip=get_month_tip(place_id,month)
+    # ── SECONDARY: date/time refinement (small nudge on the city base) ──
+    if date_str:
+        td = get_time_data(place_id)
+        busyness_avg = td.get('busyness_avg',40) or 40
+        busyness_max = td.get('busyness_max',busyness_avg) or busyness_avg
+        # weekend nudge
+        if is_weekend: score += 6
+        else:          score -= 3
+        # time-of-day nudge
+        tcol = TIME_COL.get(time_slot,'afternoon_avg')
+        tavg = td.get(tcol,busyness_avg) or busyness_avg
+        tratio = tavg/busyness_max if busyness_max>0 else 0.5
+        if   tratio>0.7: score += 5
+        elif tratio<0.3: score -= 5
+        # holiday nudge
+        if holiday: score += 8
+        score = max(0, min(100, score))
+
+    label = score_to_label_relative(city, score)
+    season = SEASONS.get(month,'Winter')
+
+    # confidence: how strongly this month stands out in the city's yearly curve
+    year_scores = [get_city_score(city,m) for m in range(1,13)]
+    year_scores = [s for s in year_scores if s is not None]
+    if year_scores:
+        spread = max(year_scores)-min(year_scores)
+        conf = int(min(92, 62 + (spread/100)*30))
+    else:
+        conf = 65
+
+    # reasons
+    reasons = list(REASONS.get(label,{}).get(season,['Seasonal crowd pattern']))
+    if date_str:
+        if is_weekend: reasons.append(f"{day_name} — weekend crowds expected")
+        else:          reasons.append(f"{day_name} — typically quieter than weekends")
+        if holiday:    reasons.append(f"Public holiday: {holiday}")
+
+    tip = get_best_months(place_id, city, month)
 
     return jsonify({
         'place_id'  :place_id,'place_name':info.get('place_name',place_id),
-        'city'      :info.get('city',''),'state':info.get('state',''),
+        'city'      :city,'state':info.get('state',''),
         'place_type':info.get('place_type',''),'emoji':TYPE_EMOJI.get(info.get('place_type',''),'📍'),
         'date'      :date_str,'month':month,'month_name':calendar.month_name[month],'year':year,
+        'score'     :round(score,1),                         # NEW: continuous 0-100 score
         'label'     :label,'base_label':base_label,'label_text':CROWD_LABEL[label],
-        'confidence':confidence,'color':CROWD_COLOR[label],'icon':CROWD_ICON[label],
-        'reasons'   :reasons,'month_tip':tip,
+        'confidence':conf,'color':CROWD_COLOR[label],'icon':CROWD_ICON[label],
+        'reasons'   :reasons[:4],'month_tip':tip,
         'day_name'  :day_name,'time_label':time_label,'time_emoji':time_emoji,
         'holiday'   :holiday,'is_weekend':is_weekend,'lat':lat,'lon':lon,
     })
@@ -306,20 +369,27 @@ def recommend():
     if not place_id: return jsonify([])
     pid=place_id if place_id in PLACE_IDX else str(place_id)
     if pid not in PLACE_IDX: return jsonify([])
-    query_crowd=get_crowd(pid,month); query_rank=CROWD_RANK.get(query_crowd,2)
+
+    qinfo=PLACE_INFO.get(pid) or PLACE_INFO.get(str(pid)) or {}
+    q_score,_ = get_crowd_score(pid, month)
     idx=PLACE_IDX[pid]; qlat=float(PLACE_LATS[idx]); qlon=float(PLACE_LONS[idx])
+
     results=[]
     for c in TOP_K.get(pid,[]):
-        cid=c['place_id']; crowd=get_crowd(cid,month)
-        crank=CROWD_RANK.get(crowd,99); dist=haversine(qlat,qlon,c['lat'],c['lon'])
+        cid=c['place_id']
+        c_score, c_label = get_crowd_score(cid, month)
+        dist=haversine(qlat,qlon,c['lat'],c['lon'])
         cinfo=PLACE_INFO.get(cid) or PLACE_INFO.get(str(cid)) or {}
-        if dist<=max_dist and crank<query_rank and crowd!='Unknown':
+        # recommend only meaningfully-less-crowded nearby places (by continuous score)
+        if dist<=max_dist and c_score < q_score - 5:
             results.append({'place_id':cid,'place_name':cinfo.get('place_name',cid),
                 'city':cinfo.get('city',''),'state':cinfo.get('state',''),
                 'place_type':cinfo.get('place_type',''),'emoji':TYPE_EMOJI.get(cinfo.get('place_type',''),'📍'),
-                'crowd':crowd,'crowd_text':CROWD_LABEL[crowd],'color':CROWD_COLOR[crowd],
-                'distance':round(dist,1),'similarity':round(c['similarity'],3),'rating':round(c.get('rating',0.0),1)})
-    results.sort(key=lambda x:(CROWD_RANK.get(x['crowd'],2),-x['similarity'],x['distance']))
+                'score':round(c_score,1),'crowd':c_label,'crowd_text':CROWD_LABEL[c_label],
+                'color':CROWD_COLOR[c_label],'distance':round(dist,1),
+                'similarity':round(c['similarity'],3),'rating':round(c.get('rating',0.0),1)})
+    # sort: lowest score first, then most similar, then nearest
+    results.sort(key=lambda x:(x['score'],-x['similarity'],x['distance']))
     return jsonify(results[:5])
 
 @app.route('/api/shap')
@@ -329,7 +399,8 @@ def shap():
 
 @app.route('/api/health')
 def health():
-    return jsonify({'status':'ok','places':len(PLACE_INFO),'version':'phase2-datetime'})
+    return jsonify({'status':'ok','places':len(PLACE_INFO),
+                    'city_scores':len(CITY_SEASON),'version':'phase3-cityseason'})
 
 if __name__=='__main__':
     app.run(debug=False,host='0.0.0.0',port=int(os.environ.get('PORT',5000)))
