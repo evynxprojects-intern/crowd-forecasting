@@ -23,7 +23,7 @@ DRIVE = {
     'shap'        : '1gE68_5TaBhvY4sPw2M_9vYF04wINC9lT',
     'time_lookup' : '1ixpJYVEfcoPeqKTDglKBWTpu8XFmUnf-',
     'city_season' : '1eGulojWQ_AeWojHdoUyX5TL87M5bUxAA',  # validated city-month scores
-    'overrides'   : 'REPLACE_WITH_OVERRIDES_FILE_ID',       # physical override rules (winter/park/falls/landmark)
+    'overrides'   : '1b0EB06NgqS8qKqYjHtf7euEuD1COdacd',    # physical override rules (winter/park/falls/landmark)
 }
 
 CACHE = '/tmp/crowd_cache'
