@@ -75,13 +75,30 @@ for k, v in CITY_SEASON.items():
 # Validated to lift seasonal accuracy to ~99% on a 100-city blind test.
 OVERRIDE_TYPE = {}
 LANDMARK_IDS  = set()
+RELIGIOUS_IDS = set()
+CITY_OVERRIDE = {}   # city (lowercase) -> dominant override type, for consistency
 try:
     ov_path = gdrive_get(DRIVE['overrides'], 'place_overrides.json')
     with open(ov_path) as f:
         _ov = json.load(f)
     OVERRIDE_TYPE = _ov.get('override_type', {})
     LANDMARK_IDS  = set(_ov.get('landmark_ids', []))
-    print(f'Overrides loaded: {len(OVERRIDE_TYPE)} tagged, {len(LANDMARK_IDS)} landmarks')
+    RELIGIOUS_IDS = set(_ov.get('religious_ids', []))
+    print(f'Overrides loaded: {len(OVERRIDE_TYPE)} tagged, {len(LANDMARK_IDS)} landmarks, {len(RELIGIOUS_IDS)} religious')
+    # Build city-level consistency: if a city has any winter_closed/ne_monsoon/park
+    # place, ALL its places inherit that seasonal-closure type (fixes the
+    # "one place Low, rest High in the same city" inconsistency).
+    from collections import Counter as _Counter
+    _city_types = {}
+    for _pid, _ot in OVERRIDE_TYPE.items():
+        if _ot in ('winter_closed', 'ne_monsoon', 'park'):
+            _info = PLACE_INFO.get(_pid) or PLACE_INFO.get(str(_pid)) or {}
+            _c = _info.get('city', '').lower().strip()
+            if _c:
+                _city_types.setdefault(_c, _Counter())[_ot] += 1
+    for _c, _cnt in _city_types.items():
+        CITY_OVERRIDE[_c] = _cnt.most_common(1)[0][0]
+    print(f'City-level overrides: {len(CITY_OVERRIDE)} cities made consistent')
 except Exception as e:
     print(f'Overrides not loaded (running without): {e}')
 
@@ -131,6 +148,30 @@ def score_to_label(score):
     if score >= 33: return 'Medium'
     return 'Low'
 
+# Festival intensity by month (higher = more/bigger Hindu festivals nationally).
+# Oct-Nov = Navratri/Dussehra/Diwali peak; Mar = Holi; Aug-Sep = Janmashtami/Ganesh.
+FESTIVAL_INTENSITY = {
+    1: 0.4,  # Makar Sankranti, Pongal
+    2: 0.2,
+    3: 0.7,  # Holi, Mahashivratri
+    4: 0.4,  # Ram Navami
+    5: 0.2,
+    6: 0.2,
+    7: 0.3,  # Rath Yatra
+    8: 0.6,  # Janmashtami, Raksha Bandhan
+    9: 0.6,  # Ganesh Chaturthi, Onam
+    10: 1.0, # Navratri, Dussehra — peak
+    11: 0.9, # Diwali, Chhath
+    12: 0.3, # Christmas (regional)
+}
+
+def religious_festival_boost(place_id, month):
+    """A religious place gets boosted in festival-heavy months (real signal:
+    festival intensity). Returns points to add (0 if not religious)."""
+    if place_id in RELIGIOUS_IDS or str(place_id) in RELIGIOUS_IDS:
+        return FESTIVAL_INTENSITY.get(month, 0.3) * 18   # up to +18 in peak festival months
+    return 0
+
 # ── Physical override rules (validated on 100-city blind test → ~99%) ──
 def apply_override(place_id, month, score):
     """
@@ -144,6 +185,12 @@ def apply_override(place_id, month, score):
     Returns (adjusted_score, forced_label_or_None).
     """
     otype = OVERRIDE_TYPE.get(place_id) or OVERRIDE_TYPE.get(str(place_id))
+    # City-level consistency: if this place isn't individually tagged but its
+    # city is a seasonal-closure city, inherit the city's type (fixes Loktak).
+    if otype is None:
+        info = PLACE_INFO.get(place_id) or PLACE_INFO.get(str(place_id)) or {}
+        ccity = info.get('city', '').lower().strip()
+        otype = CITY_OVERRIDE.get(ccity)
     if otype == 'winter_closed':
         if month in [12, 1, 2]:  return 5.0, 'Low'
         if month in [6, 7, 8, 9]: return 85.0, 'High'
@@ -238,6 +285,8 @@ def get_crowd_score(place_id, month):
         adj_score, forced_label = apply_override(place_id, month, score)
         if forced_label is not None:
             return adj_score, forced_label
+        # per-place adjustment: religious places busier in festival-heavy months
+        adj_score = min(100, adj_score + religious_festival_boost(place_id, month))
         return adj_score, score_to_label_relative(city, adj_score)
     # fallback: legacy place-level label -> approximate score
     for pid in [place_id, str(place_id)]:
@@ -362,6 +411,8 @@ def predict():
     # is a physical fact (snow-locked, park shut) and must NOT be changed by
     # weekend/time nudges. Detect by re-checking the override.
     _otype = OVERRIDE_TYPE.get(place_id) or OVERRIDE_TYPE.get(str(place_id))
+    if _otype is None:
+        _otype = CITY_OVERRIDE.get(city.lower().strip())
     hard_forced = (_otype == 'winter_closed' and month in [12,1,2,6,7,8,9]) or \
                   (_otype == 'park' and month in [6,7,8,9]) or \
                   (_otype == 'ne_monsoon' and month in [6,7,8,9]) or \
