@@ -137,6 +137,8 @@ def apply_override(place_id, month, score):
     Adjust raw city-season score using physically-grounded rules:
     - winter_closed: snow-locked high-altitude → Low in Dec-Feb, High in Jun-Sep
     - park: national parks/reserves → Low in monsoon (closed)
+    - ne_monsoon: Northeast nature/hill spots → Low in heavy monsoon (Jun-Sep)
+    - beach: beaches → boosted in winter (Nov-Feb), Low in peak monsoon (Jun-Aug)
     - falls: waterfalls → capped at Medium in monsoon
     - landmark: national icons (100k+ reviews) → +20 boost (keeps seasonal shape)
     Returns (adjusted_score, forced_label_or_None).
@@ -147,10 +149,15 @@ def apply_override(place_id, month, score):
         if month in [6, 7, 8, 9]: return 85.0, 'High'
     if otype == 'park':
         if month in [6, 7, 8, 9]: return 8.0, 'Low'
+    if otype == 'ne_monsoon':
+        if month in [6, 7, 8, 9]: return 8.0, 'Low'
+    if otype == 'beach':
+        if month in [11, 12, 1, 2]: return min(100, score + 25), None
+        if month in [6, 7, 8]:      return 8.0, 'Low'
     if otype == 'falls':
         if month in [6, 7, 8, 9]: return min(score, 55.0), None
-    # landmark boost (only if not overridden by a physical closure above)
-    if (place_id in LANDMARK_IDS or str(place_id) in LANDMARK_IDS) and otype not in ('winter_closed','park','falls'):
+    # landmark boost (only if not overridden by a physical rule above)
+    if (place_id in LANDMARK_IDS or str(place_id) in LANDMARK_IDS) and otype not in ('winter_closed','park','ne_monsoon','beach','falls'):
         return min(100, score + 20), None
     return score, None
 
@@ -356,7 +363,9 @@ def predict():
     # weekend/time nudges. Detect by re-checking the override.
     _otype = OVERRIDE_TYPE.get(place_id) or OVERRIDE_TYPE.get(str(place_id))
     hard_forced = (_otype == 'winter_closed' and month in [12,1,2,6,7,8,9]) or \
-                  (_otype == 'park' and month in [6,7,8,9])
+                  (_otype == 'park' and month in [6,7,8,9]) or \
+                  (_otype == 'ne_monsoon' and month in [6,7,8,9]) or \
+                  (_otype == 'beach' and month in [6,7,8])
 
     # ── SECONDARY: date/time refinement (small nudge on the city base) ──
     if date_str and not hard_forced:
