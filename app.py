@@ -24,6 +24,9 @@ DRIVE = {
     'time_lookup' : '1ixpJYVEfcoPeqKTDglKBWTpu8XFmUnf-',
     'city_season' : '1eGulojWQ_AeWojHdoUyX5TL87M5bUxAA',  # validated city-month scores
     'overrides'   : '1b0EB06NgqS8qKqYjHtf7euEuD1COdacd',    # physical override rules (winter/park/falls/landmark)
+    'deviation'   : '1pTJMOR9b2sLZ3XzVgGSeJWz2DYhamupw',    # per-place deviation signal (z_place)
+    'reconcile'   : '1eZWye6DdhEpGiayH4LLuiJFSLJZweKh-',    # per-city reconciliation factor
+    'dev_config'  : '1UA4Bdn2LhM933v9DmKcpAeuV2Y5EFcva',    # alpha / delta / beta config
 }
 
 CACHE = '/tmp/crowd_cache'
@@ -101,6 +104,26 @@ try:
     print(f'City-level overrides: {len(CITY_OVERRIDE)} cities made consistent')
 except Exception as e:
     print(f'Overrides not loaded (running without): {e}')
+
+# ── Phase 2: place-level deviation framework (bounded residual + reconciliation) ──
+PLACE_DEVIATION = {}
+CITY_RECONCILE  = {}
+DEV_ALPHA, DEV_DELTA = 0.15, 0.25
+try:
+    dev_path = gdrive_get(DRIVE['deviation'], 'place_deviation.json')
+    with open(dev_path) as f:
+        PLACE_DEVIATION = json.load(f)
+    rec_path = gdrive_get(DRIVE['reconcile'], 'city_reconcile.json')
+    with open(rec_path) as f:
+        CITY_RECONCILE = json.load(f)
+    cfg_path = gdrive_get(DRIVE['dev_config'], 'deviation_config.json')
+    with open(cfg_path) as f:
+        _cfg = json.load(f)
+    DEV_ALPHA = _cfg.get('alpha', 0.15)
+    DEV_DELTA = _cfg.get('delta', 0.25)
+    print(f'Deviation framework: {len(PLACE_DEVIATION)} places, {len(CITY_RECONCILE)} cities, alpha={DEV_ALPHA}')
+except Exception as e:
+    print(f'Deviation framework not loaded (places default to city score): {e}')
 
 SEARCH_INDEX = sorted([
     {
@@ -271,22 +294,43 @@ def get_city_score(city, month):
         return None
     return CITY_SEASON_LC.get((city.lower().strip(), int(month)))
 
+def apply_place_deviation(place_id, city, city_score):
+    """
+    Phase 2: bounded residual + reconciliation.
+    Adjust the city baseline for this specific place using its precomputed
+    deviation signal (popularity/busyness/velocity/rating, standardized within
+    the city). Bounded so places stay close to the city, and reconciled so the
+    city average is preserved.
+    Returns (adjusted_score, deviation_pct) where deviation_pct is for explanation.
+    """
+    z = PLACE_DEVIATION.get(str(place_id)) or PLACE_DEVIATION.get(place_id)
+    if z is None:
+        return city_score, 0.0   # no data -> defaults exactly to city score
+    # bounded multiplicative offset
+    adj = max(-DEV_DELTA, min(DEV_DELTA, DEV_ALPHA * z))
+    raw = city_score * (1 + adj)
+    # reconciliation: preserve city average
+    rf = CITY_RECONCILE.get(city) or CITY_RECONCILE.get(city.strip()) or 1.0
+    final = max(0, min(100, raw * rf))
+    return final, round((final - city_score) / city_score * 100, 1) if city_score else 0.0
+
 def get_crowd_score(place_id, month):
     """
     Return (score, label) for a place in a month.
-    Primary source = city-seasonal score (validated).
-    Falls back to legacy place-level label only if city is unknown.
+    Layer 1: validated city-seasonal score (baseline).
+    Layer 2: physical override rules (winter-closed / park / beach / landmark).
+    Layer 3: bounded place-level deviation (popularity/type), reconciled to city.
     """
     info = PLACE_INFO.get(place_id) or PLACE_INFO.get(str(place_id)) or {}
     city = info.get('city', '')
     score = get_city_score(city, month)
     if score is not None:
-        # apply physical override rules (winter-closed / park / falls / landmark)
+        # Layer 2: physical overrides (hard closures return a forced label)
         adj_score, forced_label = apply_override(place_id, month, score)
         if forced_label is not None:
             return adj_score, forced_label
-        # per-place adjustment: religious places busier in festival-heavy months
-        adj_score = min(100, adj_score + religious_festival_boost(place_id, month))
+        # Layer 3: bounded place-level deviation on top of the city base
+        adj_score, _ = apply_place_deviation(place_id, city, adj_score)
         return adj_score, score_to_label_relative(city, adj_score)
     # fallback: legacy place-level label -> approximate score
     for pid in [place_id, str(place_id)]:
