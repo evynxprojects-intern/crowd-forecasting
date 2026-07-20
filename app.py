@@ -94,6 +94,563 @@ try:
 except Exception as e:
     print(f'Place tags not loaded (running without): {e}')
 
+# Regional festival table (public calendar facts: Rath Yatra->Puri Jul, etc.)
+# Already baked into v4 scores; loaded here so the API can EXPLAIN them.
+# Regional festival table — embedded data, versioned with the code.
+# month-level entries feed reasons; 'windows' (year-specific, refresh
+# yearly for the lunar calendar) drive the festival-DAY boost in /api/predict.
+REGIONAL_FESTIVALS = [
+ {
+  "festival": "Rath Yatra",
+  "month": 7,
+  "scope": "city",
+  "value": "Puri",
+  "magnitude": 3,
+  "windows": [
+   {
+    "start": "2026-07-16",
+    "end": "2026-07-26",
+    "label": "Rath Yatra (Bahuda Jul 24, Suna Besha Jul 25)",
+    "verified": True
+   }
+  ]
+ },
+ {
+  "festival": "Rath Yatra Ranchi",
+  "month": 7,
+  "scope": "city",
+  "value": "Ranchi",
+  "magnitude": 2,
+  "windows": [
+   {
+    "start": "2026-07-16",
+    "end": "2026-07-24",
+    "label": "Rath Yatra week",
+    "verified": True
+   }
+  ]
+ },
+ {
+  "festival": "Rath Yatra Ahmedabad",
+  "month": 7,
+  "scope": "city",
+  "value": "Ahmedabad",
+  "magnitude": 2,
+  "windows": [
+   {
+    "start": "2026-07-16",
+    "end": "2026-07-17",
+    "label": "Rath Yatra",
+    "verified": True
+   }
+  ]
+ },
+ {
+  "festival": "Pushkar Camel Fair",
+  "month": 11,
+  "scope": "city",
+  "value": "Pushkar",
+  "magnitude": 3,
+  "windows": [
+   {
+    "start": "2026-11-17",
+    "end": "2026-11-24",
+    "label": "Pushkar Camel Fair",
+    "verified": False
+   }
+  ]
+ },
+ {
+  "festival": "Onam",
+  "month": 9,
+  "scope": "state",
+  "value": "Kerala",
+  "magnitude": 2,
+  "windows": [
+   {
+    "start": "2026-08-26",
+    "end": "2026-09-06",
+    "label": "Onam season (approx)",
+    "verified": False
+   }
+  ]
+ },
+ {
+  "festival": "Onam eve",
+  "month": 8,
+  "scope": "state",
+  "value": "Kerala",
+  "magnitude": 1
+ },
+ {
+  "festival": "Pongal",
+  "month": 1,
+  "scope": "state",
+  "value": "Tamil Nadu",
+  "magnitude": 2,
+  "windows": [
+   {
+    "start": "2026-01-14",
+    "end": "2026-01-17",
+    "label": "Pongal",
+    "verified": True
+   }
+  ]
+ },
+ {
+  "festival": "Durga Puja",
+  "month": 10,
+  "scope": "city",
+  "value": "Kolkata",
+  "magnitude": 3,
+  "windows": [
+   {
+    "start": "2026-10-17",
+    "end": "2026-10-22",
+    "label": "Durga Puja (approx)",
+    "verified": False
+   }
+  ]
+ },
+ {
+  "festival": "Durga Puja WB",
+  "month": 10,
+  "scope": "state",
+  "value": "West Bengal",
+  "magnitude": 2,
+  "windows": [
+   {
+    "start": "2026-10-17",
+    "end": "2026-10-22",
+    "label": "Durga Puja (approx)",
+    "verified": False
+   }
+  ]
+ },
+ {
+  "festival": "Ganesh Chaturthi",
+  "month": 9,
+  "scope": "city",
+  "value": "Mumbai",
+  "magnitude": 3,
+  "windows": [
+   {
+    "start": "2026-09-14",
+    "end": "2026-09-24",
+    "label": "Ganesh festival (approx)",
+    "verified": False
+   }
+  ]
+ },
+ {
+  "festival": "Ganesh Pune",
+  "month": 9,
+  "scope": "city",
+  "value": "Pune",
+  "magnitude": 2,
+  "windows": [
+   {
+    "start": "2026-09-14",
+    "end": "2026-09-24",
+    "label": "Ganesh festival (approx)",
+    "verified": False
+   }
+  ]
+ },
+ {
+  "festival": "Hornbill Festival",
+  "month": 12,
+  "scope": "city",
+  "value": "Kohima",
+  "magnitude": 3,
+  "windows": [
+   {
+    "start": "2026-12-01",
+    "end": "2026-12-10",
+    "label": "Hornbill Festival",
+    "verified": True
+   }
+  ]
+ },
+ {
+  "festival": "Bihu",
+  "month": 4,
+  "scope": "state",
+  "value": "Assam",
+  "magnitude": 2,
+  "windows": [
+   {
+    "start": "2026-04-14",
+    "end": "2026-04-16",
+    "label": "Rongali Bihu",
+    "verified": True
+   }
+  ]
+ },
+ {
+  "festival": "Baisakhi",
+  "month": 4,
+  "scope": "city",
+  "value": "Amritsar",
+  "magnitude": 2,
+  "windows": [
+   {
+    "start": "2026-04-13",
+    "end": "2026-04-14",
+    "label": "Baisakhi",
+    "verified": True
+   }
+  ]
+ },
+ {
+  "festival": "Navratri Garba",
+  "month": 10,
+  "scope": "city",
+  "value": "Ahmedabad",
+  "magnitude": 3,
+  "windows": [
+   {
+    "start": "2026-10-11",
+    "end": "2026-10-20",
+    "label": "Navratri (approx)",
+    "verified": False
+   }
+  ]
+ },
+ {
+  "festival": "Navratri Gujarat",
+  "month": 10,
+  "scope": "state",
+  "value": "Gujarat",
+  "magnitude": 2,
+  "windows": [
+   {
+    "start": "2026-10-11",
+    "end": "2026-10-20",
+    "label": "Navratri (approx)",
+    "verified": False
+   }
+  ]
+ },
+ {
+  "festival": "Mysore Dasara",
+  "month": 10,
+  "scope": "city",
+  "value": "Mysore",
+  "magnitude": 3,
+  "windows": [
+   {
+    "start": "2026-10-11",
+    "end": "2026-10-21",
+    "label": "Mysore Dasara (approx)",
+    "verified": False
+   }
+  ]
+ },
+ {
+  "festival": "Hemis Festival",
+  "month": 7,
+  "scope": "city",
+  "value": "Leh",
+  "magnitude": 2
+ },
+ {
+  "festival": "Desert Festival",
+  "month": 2,
+  "scope": "city",
+  "value": "Jaisalmer",
+  "magnitude": 2
+ },
+ {
+  "festival": "Rann Utsav Dec",
+  "month": 12,
+  "scope": "city",
+  "value": "Kutch",
+  "magnitude": 3,
+  "windows": [
+   {
+    "start": "2026-11-01",
+    "end": "2027-02-28",
+    "label": "Rann Utsav season",
+    "verified": True
+   }
+  ]
+ },
+ {
+  "festival": "Rann Utsav Jan",
+  "month": 1,
+  "scope": "city",
+  "value": "Kutch",
+  "magnitude": 3
+ },
+ {
+  "festival": "Konark Dance Fest",
+  "month": 12,
+  "scope": "city",
+  "value": "Konark",
+  "magnitude": 2,
+  "windows": [
+   {
+    "start": "2026-12-01",
+    "end": "2026-12-05",
+    "label": "Konark Dance Festival",
+    "verified": True
+   }
+  ]
+ },
+ {
+  "festival": "Khajuraho Dance Fest",
+  "month": 2,
+  "scope": "city",
+  "value": "Khajuraho",
+  "magnitude": 2,
+  "windows": [
+   {
+    "start": "2026-02-20",
+    "end": "2026-02-26",
+    "label": "Khajuraho Dance Festival",
+    "verified": True
+   }
+  ]
+ },
+ {
+  "festival": "Thrissur Pooram",
+  "month": 5,
+  "scope": "city",
+  "value": "Thrissur",
+  "magnitude": 3,
+  "windows": [
+   {
+    "start": "2026-04-26",
+    "end": "2026-04-27",
+    "label": "Thrissur Pooram (approx)",
+    "verified": False
+   }
+  ]
+ },
+ {
+  "festival": "Chhath Puja",
+  "month": 11,
+  "scope": "city",
+  "value": "Patna",
+  "magnitude": 3,
+  "windows": [
+   {
+    "start": "2026-11-13",
+    "end": "2026-11-16",
+    "label": "Chhath Puja (approx)",
+    "verified": False
+   }
+  ]
+ },
+ {
+  "festival": "Chhath Varanasi",
+  "month": 11,
+  "scope": "city",
+  "value": "Varanasi",
+  "magnitude": 2,
+  "windows": [
+   {
+    "start": "2026-11-13",
+    "end": "2026-11-16",
+    "label": "Chhath Puja (approx)",
+    "verified": False
+   }
+  ]
+ },
+ {
+  "festival": "Goa Carnival",
+  "month": 2,
+  "scope": "city",
+  "value": "Goa",
+  "magnitude": 2,
+  "windows": [
+   {
+    "start": "2026-02-14",
+    "end": "2026-02-17",
+    "label": "Goa Carnival",
+    "verified": True
+   }
+  ]
+ },
+ {
+  "festival": "NYE Goa",
+  "month": 12,
+  "scope": "city",
+  "value": "Goa",
+  "magnitude": 2,
+  "windows": [
+   {
+    "start": "2026-12-24",
+    "end": "2027-01-01",
+    "label": "Christmas–New Year peak",
+    "verified": True
+   }
+  ]
+ },
+ {
+  "festival": "Amarnath Yatra",
+  "month": 7,
+  "scope": "city",
+  "value": "Pahalgam",
+  "magnitude": 3,
+  "windows": [
+   {
+    "start": "2026-07-01",
+    "end": "2026-08-09",
+    "label": "Amarnath Yatra season (approx)",
+    "verified": False
+   }
+  ]
+ },
+ {
+  "festival": "Amarnath Aug",
+  "month": 8,
+  "scope": "city",
+  "value": "Pahalgam",
+  "magnitude": 2
+ },
+ {
+  "festival": "Teej",
+  "month": 8,
+  "scope": "city",
+  "value": "Jaipur",
+  "magnitude": 1
+ },
+ {
+  "festival": "Gangaur",
+  "month": 3,
+  "scope": "city",
+  "value": "Jaipur",
+  "magnitude": 1
+ },
+ {
+  "festival": "Holi Mathura",
+  "month": 3,
+  "scope": "city",
+  "value": "Mathura",
+  "magnitude": 3,
+  "windows": [
+   {
+    "start": "2026-02-25",
+    "end": "2026-03-04",
+    "label": "Braj Holi week (approx)",
+    "verified": False
+   }
+  ]
+ },
+ {
+  "festival": "Holi Vrindavan",
+  "month": 3,
+  "scope": "city",
+  "value": "Vrindavan",
+  "magnitude": 3,
+  "windows": [
+   {
+    "start": "2026-02-25",
+    "end": "2026-03-04",
+    "label": "Braj Holi week (approx)",
+    "verified": False
+   }
+  ]
+ },
+ {
+  "festival": "Buddha Purnima",
+  "month": 5,
+  "scope": "city",
+  "value": "Bodh Gaya",
+  "magnitude": 2
+ },
+ {
+  "festival": "Buddha Purnima Sarnath",
+  "month": 5,
+  "scope": "city",
+  "value": "Sarnath",
+  "magnitude": 1
+ },
+ {
+  "festival": "Magh Mela",
+  "month": 1,
+  "scope": "city",
+  "value": "Prayagraj",
+  "magnitude": 2,
+  "windows": [
+   {
+    "start": "2026-01-03",
+    "end": "2026-02-17",
+    "label": "Magh Mela (approx)",
+    "verified": False
+   }
+  ]
+ },
+ {
+  "festival": "Intl Yoga Festival",
+  "month": 3,
+  "scope": "city",
+  "value": "Rishikesh",
+  "magnitude": 2,
+  "windows": [
+   {
+    "start": "2026-03-01",
+    "end": "2026-03-07",
+    "label": "International Yoga Festival",
+    "verified": True
+   }
+  ]
+ },
+ {
+  "festival": "Tawang Festival",
+  "month": 10,
+  "scope": "city",
+  "value": "Tawang",
+  "magnitude": 2
+ },
+ {
+  "festival": "Shimla Summer Fest",
+  "month": 6,
+  "scope": "city",
+  "value": "Shimla",
+  "magnitude": 1
+ }
+]
+print(f'Regional festivals: {len(REGIONAL_FESTIVALS)} entries (embedded)')
+
+def festivals_for(city, state, month):
+    """Return festival names active in this city/state for this month."""
+    out = []
+    cl, sl = (city or '').lower(), (state or '').lower()
+    for f in REGIONAL_FESTIVALS:
+        try:
+            if int(f.get('month', 0)) != int(month):
+                continue
+            val = str(f.get('value', '')).lower()
+            if f.get('scope') == 'city' and val and val in cl:
+                out.append(f['festival'])
+            elif f.get('scope') == 'state' and val and val == sl:
+                out.append(f['festival'])
+        except Exception:
+            continue
+    return out
+
+def festival_day_for(city, state, date_iso):
+    """If this exact date falls inside a festival window for this city/state,
+    return the window label (e.g. 'Rath Yatra (Bahuda Jul 24...)') else None.
+    Windows are year-specific data in regional_festivals.json — refresh yearly."""
+    cl, sl = (city or '').lower(), (state or '').lower()
+    for f in REGIONAL_FESTIVALS:
+        val = str(f.get('value', '')).lower()
+        matches = (f.get('scope') == 'city' and val and val in cl) or \
+                  (f.get('scope') == 'state' and val and val == sl)
+        if not matches:
+            continue
+        for w in f.get('windows', []):
+            try:
+                if w['start'] <= date_iso <= w['end']:
+                    return w.get('label', f.get('festival', 'Festival'))
+            except Exception:
+                continue
+    return None
+
 # ── Phase 2: place-level deviation framework (bounded residual + reconciliation) ──
 PLACE_DEVIATION = {}
 CITY_RECONCILE  = {}
@@ -443,6 +1000,13 @@ def predict():
         if holiday: score += 8
         score = max(0, min(100, score))
 
+    # ── FESTIVAL DAY: exact date falls in a festival window for this city ──
+    # (dates are data in regional_festivals.json, refreshed yearly for the
+    # lunar calendar; e.g. Rath Yatra 2026 = Jul 16-26, Bahuda = Jul 24)
+    fest_day = festival_day_for(city, info.get('state',''), date_str) if date_str else None
+    if fest_day:
+        score = min(100, max(score + 35, 80))
+
     # label derives from the score (relative to the city's own yearly range)
     label = score_to_label_relative(city, score)
     season = SEASONS.get(month,'Winter')
@@ -458,9 +1022,15 @@ def predict():
 
     # reasons
     reasons = list(REASONS.get(label,{}).get(season,['Seasonal crowd pattern']))
+    if fest_day:
+        reasons = [f"🎉 {fest_day} — expect very heavy crowds"] + reasons
+    else:
+        _fests = festivals_for(city, info.get('state',''), month)
+        for _f in _fests[:2]:
+            reasons.insert(0, f"🎉 {_f} this month — expect festive crowds")
     if date_str:
         if is_weekend: reasons.append(f"{day_name} — weekend crowds expected")
-        else:          reasons.append(f"{day_name} — typically quieter than weekends")
+        elif not fest_day: reasons.append(f"{day_name} — typically quieter than weekends")
         if holiday:    reasons.append(f"Public holiday: {holiday}")
 
     tip = get_best_months(place_id, city, month)
@@ -513,6 +1083,21 @@ def recommend():
 def shap():
     path=gdrive_get(DRIVE['shap'],'shap_summary_bar.png')
     return send_file(path,mimetype='image/png')
+
+@app.route('/api/festivals')
+def api_festivals():
+    """Regional festivals — all, or filtered by ?city= and/or ?month=."""
+    city  = request.args.get('city', '').strip()
+    month = request.args.get('month', type=int)
+    out = REGIONAL_FESTIVALS
+    if month:
+        out = [f for f in out if int(f.get('month', 0)) == month]
+    if city:
+        cl = city.lower()
+        out = [f for f in out if (f.get('scope') == 'city' and str(f.get('value','')).lower() in cl)
+               or (f.get('scope') == 'state')]
+    return jsonify({'count': len(out), 'festivals': out})
+
 
 @app.route('/api/feedback', methods=['POST'])
 def submit_feedback():
