@@ -25,9 +25,8 @@ DRIVE = {
     'features'    : '1B7pCpjI1ezrwhjiLqS5ZbX8Sh5_IDa52',
     'shap'        : '1gE68_5TaBhvY4sPw2M_9vYF04wINC9lT',
     'time_lookup' : '1ixpJYVEfcoPeqKTDglKBWTpu8XFmUnf-',
-    'city_season' : '1eGulojWQ_AeWojHdoUyX5TL87M5bUxAA',  # validated city-month scores
-    'overrides'   : '1kSXZPQ0x2wUuGsYd2Qn53u5tg3f97JJ_',    # physical override rules + 14 govt-verified landmarks (ASI data)
-    'profiles'    : '1aaf_ZfA2quhki_qnIoHTYrIH4iPmzFsw',    # smooth harmonic seasonal profiles (v2 FIXED, validated 100%)
+    'city_season' : '1su3VPny5tya6seLPE0DYE2cbYUUynyyk',  # v4 FINAL: physics gates (cold/rain/park from lat+temp+rainfall) + fitted festival weight (w=0.20) + regional festival table — zero name lists
+    'overrides'   : '1kSXZPQ0x2wUuGsYd2Qn53u5tg3f97JJ_',    # falls tags + landmarks (incl. 14 govt-verified via ASI data)
     'deviation'   : '1pTJMOR9b2sLZ3XzVgGSeJWz2DYhamupw',    # per-place deviation signal (z_place)
     'reconcile'   : '1eZWye6DdhEpGiayH4LLuiJFSLJZweKh-',    # per-city reconciliation factor
     'dev_config'  : '1UA4Bdn2LhM933v9DmKcpAeuV2Y5EFcva',    # alpha / delta / beta config
@@ -78,12 +77,12 @@ for k, v in CITY_SEASON.items():
     city, m = k.rsplit('|', 1)
     CITY_SEASON_LC[(city.lower().strip(), int(m))] = v
 
-# NEW: physical override rules (winter-closed / park / falls / landmark).
-# Validated to lift seasonal accuracy to ~99% on a 100-city blind test.
+# Falls tags + landmark IDs (closure/monsoon physics now lives INSIDE the
+# v4 city-season scores — derived from latitude/temp/rainfall/type features,
+# no name lists; see offline build in Repo 2).
 OVERRIDE_TYPE = {}
 LANDMARK_IDS  = set()
 RELIGIOUS_IDS = set()
-CITY_OVERRIDE = {}   # city (lowercase) -> dominant override type, for consistency
 try:
     ov_path = gdrive_get(DRIVE['overrides'], 'place_overrides.json')
     with open(ov_path) as f:
@@ -91,36 +90,9 @@ try:
     OVERRIDE_TYPE = _ov.get('override_type', {})
     LANDMARK_IDS  = set(_ov.get('landmark_ids', []))
     RELIGIOUS_IDS = set(_ov.get('religious_ids', []))
-    print(f'Overrides loaded: {len(OVERRIDE_TYPE)} tagged, {len(LANDMARK_IDS)} landmarks, {len(RELIGIOUS_IDS)} religious')
-    # Build city-level consistency: if a city has any winter_closed/ne_monsoon/park
-    # place, ALL its places inherit that seasonal-closure type (fixes the
-    # "one place Low, rest High in the same city" inconsistency).
-    from collections import Counter as _Counter
-    _city_types = {}
-    for _pid, _ot in OVERRIDE_TYPE.items():
-        if _ot in ('winter_closed', 'ne_monsoon', 'park'):
-            _info = PLACE_INFO.get(_pid) or PLACE_INFO.get(str(_pid)) or {}
-            _c = _info.get('city', '').lower().strip()
-            if _c:
-                _city_types.setdefault(_c, _Counter())[_ot] += 1
-    for _c, _cnt in _city_types.items():
-        CITY_OVERRIDE[_c] = _cnt.most_common(1)[0][0]
-    print(f'City-level overrides: {len(CITY_OVERRIDE)} cities made consistent')
+    print(f'Place tags loaded: {len(OVERRIDE_TYPE)} tagged, {len(LANDMARK_IDS)} landmarks')
 except Exception as e:
-    print(f'Overrides not loaded (running without): {e}')
-
-# ── Smooth harmonic seasonal profiles (replaces binary month-cliffs) ──
-# Validated: 87/87 = 100% blind test, all 7 critical override cases pass.
-# Blend: 0.7*profile + 0.3*raw keeps city-specific signal in the mix.
-OVERRIDE_PROFILES = {}
-try:
-    prof_path = gdrive_get(DRIVE['profiles'], 'override_profiles.json')
-    with open(prof_path) as f:
-        OVERRIDE_PROFILES = json.load(f)
-    _sep = OVERRIDE_PROFILES.get('ne_monsoon', {}).get('9')
-    print(f'Smooth profiles loaded: {list(OVERRIDE_PROFILES.keys())} | ne_monsoon Sep={_sep} (must be 14.0)')
-except Exception as e:
-    print(f'Smooth profiles not loaded (falling back to binary rules): {e}')
+    print(f'Place tags not loaded (running without): {e}')
 
 # ── Phase 2: place-level deviation framework (bounded residual + reconciliation) ──
 PLACE_DEVIATION = {}
@@ -212,59 +184,22 @@ def religious_festival_boost(place_id, month):
         return FESTIVAL_INTENSITY.get(month, 0.3) * 18   # up to +18 in peak festival months
     return 0
 
-# ── Physical override rules (validated on 100-city blind test → 100%) ──
+# ── Place-level adjustments (minimal — seasonal physics lives in v4 scores) ──
 def apply_override(place_id, month, score):
     """
-    Adjust raw city-season score using physically-grounded rules.
-    Smooth harmonic profiles (no month-boundary cliffs) blended with the raw
-    city signal: blended = 0.7*profile + 0.3*raw. Validated at 100% on the
-    87-city blind test and all 7 critical override cases (Loktak-Sep=Low etc).
-    Forced labels kept for deep-closure months (physical facts) so downstream
-    hard_forced logic still skips deviation/time nudges there.
-    Falls back to binary rules automatically if profiles failed to load.
-    Returns (adjusted_score, forced_label_or_None).
+    v4 scores already encode all seasonal physics per city (cold gate from
+    latitude+annual temp, rain gate from annual rainfall, park monsoon closure
+    from type flags, regional festivals from the festival table) — derived
+    from features, zero name lists. Only two place-level adjustments remain:
+    - falls: waterfalls capped at Medium in monsoon (scenic but not packed)
+    - landmark: 100k+ reviews OR 250k+ govt-counted visitors -> +20 boost
+    Returns (adjusted_score, forced_label_or_None). forced_label is always
+    None now; labels derive from the score via relative ranking.
     """
     otype = OVERRIDE_TYPE.get(place_id) or OVERRIDE_TYPE.get(str(place_id))
-    # City-level consistency: if this place isn't individually tagged but its
-    # city is a seasonal-closure city, inherit the city's type (fixes Loktak).
-    if otype is None:
-        info = PLACE_INFO.get(place_id) or PLACE_INFO.get(str(place_id)) or {}
-        ccity = info.get('city', '').lower().strip()
-        otype = CITY_OVERRIDE.get(ccity)
-
-    prof = OVERRIDE_PROFILES.get(otype) if otype else None
-    if prof:
-        # ── smooth path: continuous seasonal curve, no cliffs ──
-        blended = 0.7 * prof[str(month)] + 0.3 * score
-        if otype == 'winter_closed':
-            if month in [12, 1, 2]:   return blended, 'Low'    # snow-locked
-            if month in [6, 7, 8, 9]: return blended, 'High'   # only open season
-            return blended, None
-        if otype == 'park':
-            if month in [6, 7, 8, 9]: return blended, 'Low'    # monsoon closure
-            return blended, None
-        if otype == 'ne_monsoon':
-            if month in [6, 7, 8, 9]: return blended, 'Low'    # heaviest monsoon
-            return blended, None
-        if otype == 'beach':
-            if month in [6, 7, 8]:    return blended, 'Low'    # monsoon
-            return blended, None
-    else:
-        # ── fallback: binary rules (if profiles file failed to load) ──
-        if otype == 'winter_closed':
-            if month in [12, 1, 2]:  return 5.0, 'Low'
-            if month in [6, 7, 8, 9]: return 85.0, 'High'
-        if otype == 'park':
-            if month in [6, 7, 8, 9]: return 8.0, 'Low'
-        if otype == 'ne_monsoon':
-            if month in [6, 7, 8, 9]: return 8.0, 'Low'
-        if otype == 'beach':
-            if month in [11, 12, 1, 2]: return min(100, score + 25), None
-            if month in [6, 7, 8]:      return 8.0, 'Low'
-    if otype == 'falls':
-        if month in [6, 7, 8, 9]: return min(score, 55.0), None
-    # landmark boost (only if not overridden by a physical rule above)
-    if (place_id in LANDMARK_IDS or str(place_id) in LANDMARK_IDS) and otype not in ('winter_closed','park','ne_monsoon','beach','falls'):
+    if otype == 'falls' and month in [6, 7, 8, 9]:
+        return min(score, 55.0), None
+    if place_id in LANDMARK_IDS or str(place_id) in LANDMARK_IDS:
         return min(100, score + 20), None
     return score, None
 
@@ -484,23 +419,14 @@ def predict():
         except Exception as e:
             print(f'Date parse error: {e}'); date_str=''
 
-    # ── PRIMARY: validated city-seasonal score (+ physical overrides) ──
+    # ── PRIMARY: v4 city-seasonal score (physics + festivals baked in) ──
     base_score, base_label = get_crowd_score(place_id, month)
     score = base_score
 
-    # Is this a hard physical override (winter-closed / park)? If so, the label
-    # is a physical fact (snow-locked, park shut) and must NOT be changed by
-    # weekend/time nudges. Detect by re-checking the override.
-    _otype = OVERRIDE_TYPE.get(place_id) or OVERRIDE_TYPE.get(str(place_id))
-    if _otype is None:
-        _otype = CITY_OVERRIDE.get(city.lower().strip())
-    hard_forced = (_otype == 'winter_closed' and month in [12,1,2,6,7,8,9]) or \
-                  (_otype == 'park' and month in [6,7,8,9]) or \
-                  (_otype == 'ne_monsoon' and month in [6,7,8,9]) or \
-                  (_otype == 'beach' and month in [6,7,8])
-
     # ── SECONDARY: date/time refinement (small nudge on the city base) ──
-    if date_str and not hard_forced:
+    # Skipped when the seasonal score indicates near-closure (physically shut
+    # places shouldn't be "un-closed" by a weekend bump).
+    if date_str and base_score >= 12:
         td = get_time_data(place_id)
         busyness_avg = td.get('busyness_avg',40) or 40
         busyness_max = td.get('busyness_max',busyness_avg) or busyness_avg
@@ -517,8 +443,8 @@ def predict():
         if holiday: score += 8
         score = max(0, min(100, score))
 
-    # forced physical labels are preserved; otherwise derive from score
-    label = base_label if hard_forced else score_to_label_relative(city, score)
+    # label derives from the score (relative to the city's own yearly range)
+    label = score_to_label_relative(city, score)
     season = SEASONS.get(month,'Winter')
 
     # confidence: how strongly this month stands out in the city's yearly curve
