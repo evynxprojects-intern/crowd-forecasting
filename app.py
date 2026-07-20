@@ -99,520 +99,395 @@ except Exception as e:
 # Regional festival table — embedded data, versioned with the code.
 # month-level entries feed reasons; 'windows' (year-specific, refresh
 # yearly for the lunar calendar) drive the festival-DAY boost in /api/predict.
-REGIONAL_FESTIVALS = [
- {
-  "festival": "Rath Yatra",
-  "month": 7,
-  "scope": "city",
-  "value": "Puri",
-  "magnitude": 3,
-  "windows": [
-   {
-    "start": "2026-07-16",
-    "end": "2026-07-26",
-    "label": "Rath Yatra (Bahuda Jul 24, Suna Besha Jul 25)",
-    "verified": True
-   }
-  ]
- },
- {
-  "festival": "Rath Yatra Ranchi",
-  "month": 7,
-  "scope": "city",
-  "value": "Ranchi",
-  "magnitude": 2,
-  "windows": [
-   {
-    "start": "2026-07-16",
-    "end": "2026-07-24",
-    "label": "Rath Yatra week",
-    "verified": True
-   }
-  ]
- },
- {
-  "festival": "Rath Yatra Ahmedabad",
-  "month": 7,
-  "scope": "city",
-  "value": "Ahmedabad",
-  "magnitude": 2,
-  "windows": [
-   {
-    "start": "2026-07-16",
-    "end": "2026-07-17",
-    "label": "Rath Yatra",
-    "verified": True
-   }
-  ]
- },
- {
-  "festival": "Pushkar Camel Fair",
-  "month": 11,
-  "scope": "city",
-  "value": "Pushkar",
-  "magnitude": 3,
-  "windows": [
-   {
-    "start": "2026-11-17",
-    "end": "2026-11-24",
-    "label": "Pushkar Camel Fair",
-    "verified": False
-   }
-  ]
- },
- {
-  "festival": "Onam",
-  "month": 9,
-  "scope": "state",
-  "value": "Kerala",
-  "magnitude": 2,
-  "windows": [
-   {
-    "start": "2026-08-26",
-    "end": "2026-09-06",
-    "label": "Onam season (approx)",
-    "verified": False
-   }
-  ]
- },
- {
-  "festival": "Onam eve",
-  "month": 8,
-  "scope": "state",
-  "value": "Kerala",
-  "magnitude": 1
- },
- {
-  "festival": "Pongal",
-  "month": 1,
-  "scope": "state",
-  "value": "Tamil Nadu",
-  "magnitude": 2,
-  "windows": [
-   {
-    "start": "2026-01-14",
-    "end": "2026-01-17",
-    "label": "Pongal",
-    "verified": True
-   }
-  ]
- },
- {
-  "festival": "Durga Puja",
-  "month": 10,
-  "scope": "city",
-  "value": "Kolkata",
-  "magnitude": 3,
-  "windows": [
-   {
-    "start": "2026-10-17",
-    "end": "2026-10-22",
-    "label": "Durga Puja (approx)",
-    "verified": False
-   }
-  ]
- },
- {
-  "festival": "Durga Puja WB",
-  "month": 10,
-  "scope": "state",
-  "value": "West Bengal",
-  "magnitude": 2,
-  "windows": [
-   {
-    "start": "2026-10-17",
-    "end": "2026-10-22",
-    "label": "Durga Puja (approx)",
-    "verified": False
-   }
-  ]
- },
- {
-  "festival": "Ganesh Chaturthi",
-  "month": 9,
-  "scope": "city",
-  "value": "Mumbai",
-  "magnitude": 3,
-  "windows": [
-   {
-    "start": "2026-09-14",
-    "end": "2026-09-24",
-    "label": "Ganesh festival (approx)",
-    "verified": False
-   }
-  ]
- },
- {
-  "festival": "Ganesh Pune",
-  "month": 9,
-  "scope": "city",
-  "value": "Pune",
-  "magnitude": 2,
-  "windows": [
-   {
-    "start": "2026-09-14",
-    "end": "2026-09-24",
-    "label": "Ganesh festival (approx)",
-    "verified": False
-   }
-  ]
- },
- {
-  "festival": "Hornbill Festival",
-  "month": 12,
-  "scope": "city",
-  "value": "Kohima",
-  "magnitude": 3,
-  "windows": [
-   {
-    "start": "2026-12-01",
-    "end": "2026-12-10",
-    "label": "Hornbill Festival",
-    "verified": True
-   }
-  ]
- },
- {
-  "festival": "Bihu",
-  "month": 4,
-  "scope": "state",
-  "value": "Assam",
-  "magnitude": 2,
-  "windows": [
-   {
-    "start": "2026-04-14",
-    "end": "2026-04-16",
-    "label": "Rongali Bihu",
-    "verified": True
-   }
-  ]
- },
- {
-  "festival": "Baisakhi",
-  "month": 4,
-  "scope": "city",
-  "value": "Amritsar",
-  "magnitude": 2,
-  "windows": [
-   {
-    "start": "2026-04-13",
-    "end": "2026-04-14",
-    "label": "Baisakhi",
-    "verified": True
-   }
-  ]
- },
- {
-  "festival": "Navratri Garba",
-  "month": 10,
-  "scope": "city",
-  "value": "Ahmedabad",
-  "magnitude": 3,
-  "windows": [
-   {
-    "start": "2026-10-11",
-    "end": "2026-10-20",
-    "label": "Navratri (approx)",
-    "verified": False
-   }
-  ]
- },
- {
-  "festival": "Navratri Gujarat",
-  "month": 10,
-  "scope": "state",
-  "value": "Gujarat",
-  "magnitude": 2,
-  "windows": [
-   {
-    "start": "2026-10-11",
-    "end": "2026-10-20",
-    "label": "Navratri (approx)",
-    "verified": False
-   }
-  ]
- },
- {
-  "festival": "Mysore Dasara",
-  "month": 10,
-  "scope": "city",
-  "value": "Mysore",
-  "magnitude": 3,
-  "windows": [
-   {
-    "start": "2026-10-11",
-    "end": "2026-10-21",
-    "label": "Mysore Dasara (approx)",
-    "verified": False
-   }
-  ]
- },
- {
-  "festival": "Hemis Festival",
-  "month": 7,
-  "scope": "city",
-  "value": "Leh",
-  "magnitude": 2
- },
- {
-  "festival": "Desert Festival",
-  "month": 2,
-  "scope": "city",
-  "value": "Jaisalmer",
-  "magnitude": 2
- },
- {
-  "festival": "Rann Utsav Dec",
-  "month": 12,
-  "scope": "city",
-  "value": "Kutch",
-  "magnitude": 3,
-  "windows": [
-   {
-    "start": "2026-11-01",
-    "end": "2027-02-28",
-    "label": "Rann Utsav season",
-    "verified": True
-   }
-  ]
- },
- {
-  "festival": "Rann Utsav Jan",
-  "month": 1,
-  "scope": "city",
-  "value": "Kutch",
-  "magnitude": 3
- },
- {
-  "festival": "Konark Dance Fest",
-  "month": 12,
-  "scope": "city",
-  "value": "Konark",
-  "magnitude": 2,
-  "windows": [
-   {
-    "start": "2026-12-01",
-    "end": "2026-12-05",
-    "label": "Konark Dance Festival",
-    "verified": True
-   }
-  ]
- },
- {
-  "festival": "Khajuraho Dance Fest",
-  "month": 2,
-  "scope": "city",
-  "value": "Khajuraho",
-  "magnitude": 2,
-  "windows": [
-   {
-    "start": "2026-02-20",
-    "end": "2026-02-26",
-    "label": "Khajuraho Dance Festival",
-    "verified": True
-   }
-  ]
- },
- {
-  "festival": "Thrissur Pooram",
-  "month": 5,
-  "scope": "city",
-  "value": "Thrissur",
-  "magnitude": 3,
-  "windows": [
-   {
-    "start": "2026-04-26",
-    "end": "2026-04-27",
-    "label": "Thrissur Pooram (approx)",
-    "verified": False
-   }
-  ]
- },
- {
-  "festival": "Chhath Puja",
-  "month": 11,
-  "scope": "city",
-  "value": "Patna",
-  "magnitude": 3,
-  "windows": [
-   {
-    "start": "2026-11-13",
-    "end": "2026-11-16",
-    "label": "Chhath Puja (approx)",
-    "verified": False
-   }
-  ]
- },
- {
-  "festival": "Chhath Varanasi",
-  "month": 11,
-  "scope": "city",
-  "value": "Varanasi",
-  "magnitude": 2,
-  "windows": [
-   {
-    "start": "2026-11-13",
-    "end": "2026-11-16",
-    "label": "Chhath Puja (approx)",
-    "verified": False
-   }
-  ]
- },
- {
-  "festival": "Goa Carnival",
-  "month": 2,
-  "scope": "city",
-  "value": "Goa",
-  "magnitude": 2,
-  "windows": [
-   {
-    "start": "2026-02-14",
-    "end": "2026-02-17",
-    "label": "Goa Carnival",
-    "verified": True
-   }
-  ]
- },
- {
-  "festival": "NYE Goa",
-  "month": 12,
-  "scope": "city",
-  "value": "Goa",
-  "magnitude": 2,
-  "windows": [
-   {
-    "start": "2026-12-24",
-    "end": "2027-01-01",
-    "label": "Christmas–New Year peak",
-    "verified": True
-   }
-  ]
- },
- {
-  "festival": "Amarnath Yatra",
-  "month": 7,
-  "scope": "city",
-  "value": "Pahalgam",
-  "magnitude": 3,
-  "windows": [
-   {
-    "start": "2026-07-01",
-    "end": "2026-08-09",
-    "label": "Amarnath Yatra season (approx)",
-    "verified": False
-   }
-  ]
- },
- {
-  "festival": "Amarnath Aug",
-  "month": 8,
-  "scope": "city",
-  "value": "Pahalgam",
-  "magnitude": 2
- },
- {
-  "festival": "Teej",
-  "month": 8,
-  "scope": "city",
-  "value": "Jaipur",
-  "magnitude": 1
- },
- {
-  "festival": "Gangaur",
-  "month": 3,
-  "scope": "city",
-  "value": "Jaipur",
-  "magnitude": 1
- },
- {
-  "festival": "Holi Mathura",
-  "month": 3,
-  "scope": "city",
-  "value": "Mathura",
-  "magnitude": 3,
-  "windows": [
-   {
-    "start": "2026-02-25",
-    "end": "2026-03-04",
-    "label": "Braj Holi week (approx)",
-    "verified": False
-   }
-  ]
- },
- {
-  "festival": "Holi Vrindavan",
-  "month": 3,
-  "scope": "city",
-  "value": "Vrindavan",
-  "magnitude": 3,
-  "windows": [
-   {
-    "start": "2026-02-25",
-    "end": "2026-03-04",
-    "label": "Braj Holi week (approx)",
-    "verified": False
-   }
-  ]
- },
- {
-  "festival": "Buddha Purnima",
-  "month": 5,
-  "scope": "city",
-  "value": "Bodh Gaya",
-  "magnitude": 2
- },
- {
-  "festival": "Buddha Purnima Sarnath",
-  "month": 5,
-  "scope": "city",
-  "value": "Sarnath",
-  "magnitude": 1
- },
- {
-  "festival": "Magh Mela",
-  "month": 1,
-  "scope": "city",
-  "value": "Prayagraj",
-  "magnitude": 2,
-  "windows": [
-   {
-    "start": "2026-01-03",
-    "end": "2026-02-17",
-    "label": "Magh Mela (approx)",
-    "verified": False
-   }
-  ]
- },
- {
-  "festival": "Intl Yoga Festival",
-  "month": 3,
-  "scope": "city",
-  "value": "Rishikesh",
-  "magnitude": 2,
-  "windows": [
-   {
-    "start": "2026-03-01",
-    "end": "2026-03-07",
-    "label": "International Yoga Festival",
-    "verified": True
-   }
-  ]
- },
- {
-  "festival": "Tawang Festival",
-  "month": 10,
-  "scope": "city",
-  "value": "Tawang",
-  "magnitude": 2
- },
- {
-  "festival": "Shimla Summer Fest",
-  "month": 6,
-  "scope": "city",
-  "value": "Shimla",
-  "magnitude": 1
- }
-]
+# Regional festival table — embedded data, versioned with the code.
+# 'windows' are year-specific (2026-27), verified against panchang where
+# marked True; refresh yearly. Edit this list to add festivals — no rebuild.
+REGIONAL_FESTIVALS = [{'festival': 'Rath Yatra',
+  'month': 7,
+  'scope': 'city',
+  'value': 'Puri',
+  'magnitude': 3,
+  'windows': [{'start': '2026-07-16',
+               'end': '2026-07-26',
+               'label': 'Rath Yatra (Bahuda Jul 24, Suna Besha Jul 25)',
+               'verified': True}]},
+ {'festival': 'Rath Yatra Ranchi',
+  'month': 7,
+  'scope': 'city',
+  'value': 'Ranchi',
+  'magnitude': 2,
+  'windows': [{'start': '2026-07-16', 'end': '2026-07-24', 'label': 'Rath Yatra week', 'verified': True}]},
+ {'festival': 'Rath Yatra Ahmedabad',
+  'month': 7,
+  'scope': 'city',
+  'value': 'Ahmedabad',
+  'magnitude': 2,
+  'windows': [{'start': '2026-07-16', 'end': '2026-07-17', 'label': 'Rath Yatra', 'verified': True}]},
+ {'festival': 'Pushkar Camel Fair',
+  'month': 11,
+  'scope': 'city',
+  'value': 'Pushkar',
+  'magnitude': 3,
+  'windows': [{'start': '2026-11-17',
+               'end': '2026-11-24',
+               'label': 'Pushkar Camel Fair',
+               'verified': False}]},
+ {'festival': 'Onam',
+  'month': 9,
+  'scope': 'state',
+  'value': 'Kerala',
+  'magnitude': 2,
+  'windows': [{'start': '2026-08-17',
+               'end': '2026-08-27',
+               'label': 'Onam (Thiruvonam Aug 26)',
+               'verified': True}]},
+ {'festival': 'Onam eve', 'month': 8, 'scope': 'state', 'value': 'Kerala', 'magnitude': 1},
+ {'festival': 'Pongal',
+  'month': 1,
+  'scope': 'state',
+  'value': 'Tamil Nadu',
+  'magnitude': 2,
+  'windows': [{'start': '2026-01-14', 'end': '2026-01-17', 'label': 'Pongal', 'verified': True}]},
+ {'festival': 'Durga Puja',
+  'month': 10,
+  'scope': 'city',
+  'value': 'Kolkata',
+  'magnitude': 3,
+  'windows': [{'start': '2026-10-15',
+               'end': '2026-10-20',
+               'label': 'Durga Puja (Dashami Oct 20)',
+               'verified': True}]},
+ {'festival': 'Durga Puja WB',
+  'month': 10,
+  'scope': 'state',
+  'value': 'West Bengal',
+  'magnitude': 2,
+  'windows': [{'start': '2026-10-15',
+               'end': '2026-10-20',
+               'label': 'Durga Puja (Dashami Oct 20)',
+               'verified': True}]},
+ {'festival': 'Ganesh Chaturthi',
+  'month': 9,
+  'scope': 'city',
+  'value': 'Mumbai',
+  'magnitude': 3,
+  'windows': [{'start': '2026-09-14',
+               'end': '2026-09-24',
+               'label': 'Ganesh festival (visarjan ~Sep 24)',
+               'verified': True}]},
+ {'festival': 'Ganesh Pune',
+  'month': 9,
+  'scope': 'city',
+  'value': 'Pune',
+  'magnitude': 2,
+  'windows': [{'start': '2026-09-14',
+               'end': '2026-09-24',
+               'label': 'Ganesh festival (visarjan ~Sep 24)',
+               'verified': True}]},
+ {'festival': 'Hornbill Festival',
+  'month': 12,
+  'scope': 'city',
+  'value': 'Kohima',
+  'magnitude': 3,
+  'windows': [{'start': '2026-12-01', 'end': '2026-12-10', 'label': 'Hornbill Festival', 'verified': True}]},
+ {'festival': 'Bihu',
+  'month': 4,
+  'scope': 'state',
+  'value': 'Assam',
+  'magnitude': 2,
+  'windows': [{'start': '2026-04-14', 'end': '2026-04-16', 'label': 'Rongali Bihu', 'verified': True}]},
+ {'festival': 'Baisakhi',
+  'month': 4,
+  'scope': 'city',
+  'value': 'Amritsar',
+  'magnitude': 2,
+  'windows': [{'start': '2026-04-13', 'end': '2026-04-14', 'label': 'Baisakhi', 'verified': True}]},
+ {'festival': 'Navratri Garba',
+  'month': 10,
+  'scope': 'city',
+  'value': 'Ahmedabad',
+  'magnitude': 3,
+  'windows': [{'start': '2026-10-11',
+               'end': '2026-10-20',
+               'label': 'Navratri Garba (Oct 11-20)',
+               'verified': True}]},
+ {'festival': 'Navratri Gujarat',
+  'month': 10,
+  'scope': 'state',
+  'value': 'Gujarat',
+  'magnitude': 2,
+  'windows': [{'start': '2026-10-11',
+               'end': '2026-10-20',
+               'label': 'Navratri (Oct 11-20)',
+               'verified': True}]},
+ {'festival': 'Mysore Dasara',
+  'month': 10,
+  'scope': 'city',
+  'value': 'Mysore',
+  'magnitude': 3,
+  'windows': [{'start': '2026-10-11',
+               'end': '2026-10-20',
+               'label': 'Mysore Dasara (Oct 11-20)',
+               'verified': True}]},
+ {'festival': 'Hemis Festival', 'month': 7, 'scope': 'city', 'value': 'Leh', 'magnitude': 2},
+ {'festival': 'Desert Festival', 'month': 2, 'scope': 'city', 'value': 'Jaisalmer', 'magnitude': 2},
+ {'festival': 'Rann Utsav Dec',
+  'month': 12,
+  'scope': 'city',
+  'value': 'Kutch',
+  'magnitude': 3,
+  'windows': [{'start': '2026-11-01', 'end': '2027-02-28', 'label': 'Rann Utsav season', 'verified': True}]},
+ {'festival': 'Rann Utsav Jan', 'month': 1, 'scope': 'city', 'value': 'Kutch', 'magnitude': 3},
+ {'festival': 'Konark Dance Fest',
+  'month': 12,
+  'scope': 'city',
+  'value': 'Konark',
+  'magnitude': 2,
+  'windows': [{'start': '2026-12-01',
+               'end': '2026-12-05',
+               'label': 'Konark Dance Festival',
+               'verified': True}]},
+ {'festival': 'Khajuraho Dance Fest',
+  'month': 2,
+  'scope': 'city',
+  'value': 'Khajuraho',
+  'magnitude': 2,
+  'windows': [{'start': '2026-02-20',
+               'end': '2026-02-26',
+               'label': 'Khajuraho Dance Festival',
+               'verified': True}]},
+ {'festival': 'Thrissur Pooram',
+  'month': 5,
+  'scope': 'city',
+  'value': 'Thrissur',
+  'magnitude': 3,
+  'windows': [{'start': '2026-04-26',
+               'end': '2026-04-27',
+               'label': 'Thrissur Pooram (approx)',
+               'verified': False}]},
+ {'festival': 'Chhath Puja',
+  'month': 11,
+  'scope': 'city',
+  'value': 'Patna',
+  'magnitude': 3,
+  'windows': [{'start': '2026-11-13',
+               'end': '2026-11-16',
+               'label': 'Chhath Puja (main day Nov 15)',
+               'verified': True}]},
+ {'festival': 'Chhath Varanasi',
+  'month': 11,
+  'scope': 'city',
+  'value': 'Varanasi',
+  'magnitude': 2,
+  'windows': [{'start': '2026-11-13',
+               'end': '2026-11-16',
+               'label': 'Chhath Puja (main day Nov 15)',
+               'verified': True}]},
+ {'festival': 'Goa Carnival',
+  'month': 2,
+  'scope': 'city',
+  'value': 'Goa',
+  'magnitude': 2,
+  'windows': [{'start': '2026-02-14', 'end': '2026-02-17', 'label': 'Goa Carnival', 'verified': True}]},
+ {'festival': 'NYE Goa',
+  'month': 12,
+  'scope': 'city',
+  'value': 'Goa',
+  'magnitude': 2,
+  'windows': [{'start': '2026-12-24',
+               'end': '2027-01-01',
+               'label': 'Christmas–New Year peak',
+               'verified': True}]},
+ {'festival': 'Amarnath Yatra',
+  'month': 7,
+  'scope': 'city',
+  'value': 'Pahalgam',
+  'magnitude': 3,
+  'windows': [{'start': '2026-07-01',
+               'end': '2026-08-09',
+               'label': 'Amarnath Yatra season (approx)',
+               'verified': False}]},
+ {'festival': 'Amarnath Aug', 'month': 8, 'scope': 'city', 'value': 'Pahalgam', 'magnitude': 2},
+ {'festival': 'Teej', 'month': 8, 'scope': 'city', 'value': 'Jaipur', 'magnitude': 1},
+ {'festival': 'Gangaur', 'month': 3, 'scope': 'city', 'value': 'Jaipur', 'magnitude': 1},
+ {'festival': 'Holi Mathura',
+  'month': 3,
+  'scope': 'city',
+  'value': 'Mathura',
+  'magnitude': 3,
+  'windows': [{'start': '2026-02-25',
+               'end': '2026-03-04',
+               'label': 'Braj Holi week (approx)',
+               'verified': False}]},
+ {'festival': 'Holi Vrindavan',
+  'month': 3,
+  'scope': 'city',
+  'value': 'Vrindavan',
+  'magnitude': 3,
+  'windows': [{'start': '2026-02-25',
+               'end': '2026-03-04',
+               'label': 'Braj Holi week (approx)',
+               'verified': False}]},
+ {'festival': 'Buddha Purnima', 'month': 5, 'scope': 'city', 'value': 'Bodh Gaya', 'magnitude': 2},
+ {'festival': 'Buddha Purnima Sarnath', 'month': 5, 'scope': 'city', 'value': 'Sarnath', 'magnitude': 1},
+ {'festival': 'Magh Mela',
+  'month': 1,
+  'scope': 'city',
+  'value': 'Prayagraj',
+  'magnitude': 2,
+  'windows': [{'start': '2026-01-03',
+               'end': '2026-02-17',
+               'label': 'Magh Mela (approx)',
+               'verified': False}]},
+ {'festival': 'Intl Yoga Festival',
+  'month': 3,
+  'scope': 'city',
+  'value': 'Rishikesh',
+  'magnitude': 2,
+  'windows': [{'start': '2026-03-01',
+               'end': '2026-03-07',
+               'label': 'International Yoga Festival',
+               'verified': True}]},
+ {'festival': 'Tawang Festival', 'month': 10, 'scope': 'city', 'value': 'Tawang', 'magnitude': 2},
+ {'festival': 'Shimla Summer Fest', 'month': 6, 'scope': 'city', 'value': 'Shimla', 'magnitude': 1},
+ {'festival': 'Kanwar Yatra',
+  'month': 8,
+  'scope': 'city',
+  'value': 'Haridwar',
+  'magnitude': 3,
+  'windows': [{'start': '2026-07-30',
+               'end': '2026-08-12',
+               'label': 'Kanwar Yatra (Shravan)',
+               'verified': False}]},
+ {'festival': 'Kanwar Yatra Rishikesh',
+  'month': 8,
+  'scope': 'city',
+  'value': 'Rishikesh',
+  'magnitude': 2,
+  'windows': [{'start': '2026-07-30',
+               'end': '2026-08-12',
+               'label': 'Kanwar Yatra (Shravan)',
+               'verified': False}]},
+ {'festival': 'Janmashtami Mathura',
+  'month': 9,
+  'scope': 'city',
+  'value': 'Mathura',
+  'magnitude': 3,
+  'windows': [{'start': '2026-09-03',
+               'end': '2026-09-05',
+               'label': 'Janmashtami (Sep 4)',
+               'verified': True}]},
+ {'festival': 'Janmashtami Vrindavan',
+  'month': 9,
+  'scope': 'city',
+  'value': 'Vrindavan',
+  'magnitude': 3,
+  'windows': [{'start': '2026-09-03',
+               'end': '2026-09-05',
+               'label': 'Janmashtami (Sep 4)',
+               'verified': True}]},
+ {'festival': 'Independence Day Delhi',
+  'month': 8,
+  'scope': 'city',
+  'value': 'Delhi',
+  'magnitude': 1,
+  'windows': [{'start': '2026-08-15',
+               'end': '2026-08-15',
+               'label': 'Independence Day (Red Fort)',
+               'verified': True}]},
+ {'festival': 'Nehru Trophy Boat Race',
+  'month': 8,
+  'scope': 'city',
+  'value': 'Alleppey',
+  'magnitude': 2,
+  'windows': [{'start': '2026-08-08',
+               'end': '2026-08-08',
+               'label': 'Nehru Trophy Boat Race (approx)',
+               'verified': False}]},
+ {'festival': 'Kullu Dussehra',
+  'month': 10,
+  'scope': 'city',
+  'value': 'Kullu',
+  'magnitude': 3,
+  'windows': [{'start': '2026-10-20',
+               'end': '2026-10-26',
+               'label': 'Kullu Dussehra (starts Oct 20)',
+               'verified': True}]},
+ {'festival': 'Dev Deepawali',
+  'month': 11,
+  'scope': 'city',
+  'value': 'Varanasi',
+  'magnitude': 3,
+  'windows': [{'start': '2026-11-23',
+               'end': '2026-11-24',
+               'label': 'Dev Deepawali (Nov 24)',
+               'verified': True}]},
+ {'festival': 'Diwali Amritsar',
+  'month': 11,
+  'scope': 'city',
+  'value': 'Amritsar',
+  'magnitude': 2,
+  'windows': [{'start': '2026-11-07',
+               'end': '2026-11-09',
+               'label': 'Diwali / Bandi Chhor Divas (Nov 8)',
+               'verified': True}]},
+ {'festival': 'Guru Nanak Jayanti',
+  'month': 11,
+  'scope': 'city',
+  'value': 'Amritsar',
+  'magnitude': 2,
+  'windows': [{'start': '2026-11-23',
+               'end': '2026-11-24',
+               'label': 'Guru Nanak Jayanti (Nov 24)',
+               'verified': True}]},
+ {'festival': 'Sonepur Mela',
+  'month': 11,
+  'scope': 'city',
+  'value': 'Sonepur',
+  'magnitude': 2,
+  'windows': [{'start': '2026-11-24',
+               'end': '2026-12-20',
+               'label': 'Sonepur Mela (approx)',
+               'verified': False}]},
+ {'festival': 'Margazhi Season',
+  'month': 12,
+  'scope': 'city',
+  'value': 'Chennai',
+  'magnitude': 1,
+  'windows': [{'start': '2026-12-15',
+               'end': '2027-01-15',
+               'label': 'Margazhi music season',
+               'verified': True}]},
+ {'festival': 'Mount Abu Winter Fest',
+  'month': 12,
+  'scope': 'city',
+  'value': 'Mount Abu',
+  'magnitude': 1,
+  'windows': [{'start': '2026-12-29', 'end': '2026-12-31', 'label': 'Winter Festival', 'verified': False}]},
+ {'festival': 'Uttarayan Kite Festival',
+  'month': 1,
+  'scope': 'city',
+  'value': 'Ahmedabad',
+  'magnitude': 2,
+  'windows': [{'start': '2027-01-13',
+               'end': '2027-01-15',
+               'label': 'Uttarayan Kite Festival',
+               'verified': True}]},
+ {'festival': 'Ganga Sagar Mela',
+  'month': 1,
+  'scope': 'city',
+  'value': 'Kolkata',
+  'magnitude': 1,
+  'windows': [{'start': '2027-01-12',
+               'end': '2027-01-15',
+               'label': 'Ganga Sagar Mela (approx)',
+               'verified': False}]},
+ {'festival': 'Republic Day Delhi',
+  'month': 1,
+  'scope': 'city',
+  'value': 'Delhi',
+  'magnitude': 1,
+  'windows': [{'start': '2027-01-26', 'end': '2027-01-26', 'label': 'Republic Day', 'verified': True}]}]
 print(f'Regional festivals: {len(REGIONAL_FESTIVALS)} entries (embedded)')
 
 def festivals_for(city, state, month):
